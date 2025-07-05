@@ -1,0 +1,20 @@
+{% extends 'main_app/base.html' %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <!-- Include all the form sections -->
+            {% include 'main_app/partials/_basic_info_section.html' %}
+            {% include 'main_app/partials/_industry_section.html' %}
+            {% include 'main_app/partials/_ssc_section.html' %}
+            {% include 'main_app/partials/_boat_section.html' %}
+            {% include 'main_app/partials/_program_section.html' %}
+            {% include 'main_app/partials/_outreach_section.html' %}
+            {% include 'main_app/partials/_campus_section.html' %}
+            {% include 'main_app/partials/_challenges_section.html' %}
+            {% include 'main_app/partials/_timelines_section.html' %}
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,16 @@
+{% extends 'main_app/base.html' %}
+
+{% block content %}
+<div class="container">
+    <div class="form-section">
+        <h2 class="section-title">Confirm Deletion</h2>
+        <p>Are you sure you want to delete this {{ object|yesno:"entry,entry" }}?</p>
+        <p><strong>{{ object }}</strong></p>
+        <form method="post">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-danger">Yes, Delete</button>
+            <a href="{% url 'dashboard' %}" class="btn btn-secondary">Cancel</a>
+        </form>
+    </div>
+</div>
+{% endblock %}

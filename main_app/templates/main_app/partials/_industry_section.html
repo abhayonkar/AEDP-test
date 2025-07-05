@@ -1,0 +1,51 @@
+<div class="form-section" id="industry">
+    <h2 class="section-title"><i class="fas fa-handshake me-2"></i>Industry Engagement & MoUs</h2>
+    
+    <!-- Form to add a new entry -->
+    <form method="post" action="{% url 'industry_create' %}">
+        {% csrf_token %}
+        <div class="row">
+            {% for field in industry_form %}
+            <div class="col-md-6 mb-3">
+                <label class="form-label">{{ field.label }}</label>
+                {{ field }}
+            </div>
+            {% endfor %}
+        </div>
+        <button type="submit" class="btn btn-primary">Add Industry Entry</button>
+    </form>
+    
+    <hr class="my-4">
+
+    <!-- Table of existing entries -->
+    <h3 class="h5">Existing Entries</h3>
+    <div class="table-responsive">
+        <table class="table table-bordered table-striped mt-2">
+            <thead>
+                <tr>
+                    <th>Industry Name</th>
+                    <th>Sector</th>
+                    <th>MoU Signed</th>
+                    <th>Engagement Type</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for entry in industry_entries %}
+                <tr>
+                    <td>{{ entry.industry_name }}</td>
+                    <td>{{ entry.sector_name }}</td>
+                    <td>{{ entry.mou_signed }}</td>
+                    <td>{{ entry.type_of_engagement }}</td>
+                    <td>
+                        <a href="{% url 'industry_update' entry.pk %}" class="btn btn-sm btn-warning"><i class="fas fa-edit"></i></a>
+                        <a href="{% url 'industry_delete' entry.pk %}" class="btn btn-sm btn-danger"><i class="fas fa-trash"></i></a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="5" class="text-center">No industry data added yet.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>

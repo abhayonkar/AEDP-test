@@ -1,0 +1,23 @@
+<div class="form-section" id="campus">
+    <h2 class="section-title"><i class="fas fa-university me-2"></i>Campus & College Details</h2>
+    <form method="post" action="{% url 'campus_create' %}">
+        {% csrf_token %}
+        <div class="row">
+            {% for field in campus_form %}<div class="col-md-6 mb-3"><label class="form-label">{{ field.label }}</label>{{ field }}</div>{% endfor %}
+        </div>
+        <button type="submit" class="btn btn-primary">Add Campus Entry</button>
+    </form>
+    <hr class="my-4">
+    <h3 class="h5">Existing Entries</h3>
+    <div class="table-responsive">
+        <table class="table table-bordered table-striped mt-2">
+            <thead><tr><th>Campus/College</th><th>Programme</th><th>Duration</th><th>Intake</th><th>Actions</th></tr></thead>
+            <tbody>
+                {% for entry in campus_entries %}
+                <tr><td>{{ entry.campus_college_name }}</td><td>{{ entry.aedp_programme }}</td><td>{{ entry.duration }}</td><td>{{ entry.student_intake }}</td>
+                    <td><a href="{% url 'campus_update' entry.pk %}" class="btn btn-sm btn-warning"><i class="fas fa-edit"></i></a> <a href="{% url 'campus_delete' entry.pk %}" class="btn btn-sm btn-danger"><i class="fas fa-trash"></i></a></td></tr>
+                {% empty %}<tr><td colspan="5" class="text-center">No Campus data added yet.</td></tr>{% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>

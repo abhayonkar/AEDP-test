@@ -1,0 +1,23 @@
+<div class="form-section" id="program">
+    <h2 class="section-title"><i class="fas fa-project-diagram me-2"></i>Program Implementation Progress</h2>
+    <form method="post" action="{% url 'program_create' %}">
+        {% csrf_token %}
+        <div class="row">
+            {% for field in program_form %}<div class="col-md-6 mb-3"><label class="form-label">{{ field.label }}</label>{{ field }}</div>{% endfor %}
+        </div>
+        <button type="submit" class="btn btn-primary">Add Program Entry</button>
+    </form>
+    <hr class="my-4">
+    <h3 class="h5">Existing Entries</h3>
+    <div class="table-responsive">
+        <table class="table table-bordered table-striped mt-2">
+            <thead><tr><th>Program Name</th><th>Component</th><th>Status</th><th>Timeline</th><th>Actions</th></tr></thead>
+            <tbody>
+                {% for entry in program_entries %}
+                <tr><td>{{ entry.program_name }}</td><td>{{ entry.component }}</td><td>{{ entry.status }}</td><td>{{ entry.timeline }}</td>
+                    <td><a href="{% url 'program_update' entry.pk %}" class="btn btn-sm btn-warning"><i class="fas fa-edit"></i></a> <a href="{% url 'program_delete' entry.pk %}" class="btn btn-sm btn-danger"><i class="fas fa-trash"></i></a></td></tr>
+                {% empty %}<tr><td colspan="5" class="text-center">No Program data added yet.</td></tr>{% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>

@@ -1,0 +1,25 @@
+<div class="form-section" id="basic_info">
+    <h2 class="section-title"><i class="fas fa-info-circle me-2"></i>Basic Information</h2>
+    <form method="post" action="{% url 'update_basic_info' %}">
+        {% csrf_token %}
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <label class="form-label">University Name</label>
+                {{ basic_info_form.university_name }}
+            </div>
+            <div class="col-md-6 mb-3">
+                <label class="form-label">PVC Name</label>
+                {{ basic_info_form.pvc_name }}
+            </div>
+            <div class="col-md-6 mb-3">
+                <label class="form-label">Report Date</label>
+                {{ basic_info_form.report_date }}
+            </div>
+            <div class="col-md-6 mb-3">
+                <label class="form-label">Academic Year</label>
+                {{ basic_info_form.academic_year }}
+            </div>
+        </div>
+        <button type="submit" class="btn btn-primary">Update Basic Info</button>
+    </form>
+</div>

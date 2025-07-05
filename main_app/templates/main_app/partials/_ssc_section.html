@@ -1,0 +1,23 @@
+<div class="form-section" id="ssc">
+    <h2 class="section-title"><i class="fas fa-users-gear me-2"></i>Sector Skill Council (SSC)</h2>
+    <form method="post" action="{% url 'ssc_create' %}">
+        {% csrf_token %}
+        <div class="row">
+            {% for field in ssc_form %}<div class="col-md-6 mb-3"><label class="form-label">{{ field.label }}</label>{{ field }}</div>{% endfor %}
+        </div>
+        <button type="submit" class="btn btn-primary">Add SSC Entry</button>
+    </form>
+    <hr class="my-4">
+    <h3 class="h5">Existing Entries</h3>
+    <div class="table-responsive">
+        <table class="table table-bordered table-striped mt-2">
+            <thead><tr><th>SSC Name</th><th>Sector</th><th>MoU Signed</th><th>Actions</th></tr></thead>
+            <tbody>
+                {% for entry in ssc_entries %}
+                <tr><td>{{ entry.ssc_name }}</td><td>{{ entry.sector_name }}</td><td>{{ entry.mou_signed }}</td>
+                    <td><a href="{% url 'ssc_update' entry.pk %}" class="btn btn-sm btn-warning"><i class="fas fa-edit"></i></a> <a href="{% url 'ssc_delete' entry.pk %}" class="btn btn-sm btn-danger"><i class="fas fa-trash"></i></a></td></tr>
+                {% empty %}<tr><td colspan="4" class="text-center">No SSC data added yet.</td></tr>{% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
