@@ -3,28 +3,46 @@
 # Exit immediately if a command exits with a non-zero status.
 set -e
 
-# PART 1: Install system dependencies in the build environment
+# PART 1: Install system dependencies
 echo "--- Installing WeasyPrint System Dependencies ---"
-yum install -y pango pango-devel cairo cairo-devel gdk-pixbuf2 gdk-pixbuf2-devel libffi-devel
+yum install -y pango pango-devel cairo cairo-devel gdk-pixbuf2 gdk-pixbuf2-devel libffi-devel fontconfig
 
-# PART 2: Copy the installed libraries into the function's runtime environment
-echo "--- Packaging Shared Libraries ---"
+# PART 2: Locate and package the required shared libraries
+echo "--- Locating and Packaging Shared Libraries ---"
 
-# Create a 'lib' directory in the root of our project output
+# Create a 'lib' directory in the project root. This will be packaged with the function.
 mkdir -p lib
 
-# Find and copy the required .so files from the system path into our new 'lib' directory.
-# The -L flag ensures we copy the actual file, not just a symbolic link.
-cp -L /usr/lib64/libpango-1.0.so.0 lib/
-cp -L /usr/lib64/libpangocairo-1.0.so.0 lib/
-cp -L /usr/lib64/libpangoft2-1.0.so.0 lib/
-cp -L /usr/lib64/libcairo.so.2 lib/
-cp -L /usr/lib64/libgdk_pixbuf-2.0.so.0 lib/
-cp -L /usr/lib64/libgobject-2.0.so.0 lib/
-cp -L /usr/lib64/libglib-2.0.so.0 lib/
-cp -L /usr/lib64/libffi.so.6 lib/
-cp -L /usr/lib64/libfontconfig.so.1 lib/
-cp -L /usr/lib64/libfreetype.so.6 lib/
+# Define the list of required libraries
+LIBS=(
+    "libpango-1.0.so.0"
+    "libpangocairo-1.0.so.0"
+    "libpangoft2-1.0.so.0"
+    "libcairo.so.2"
+    "libgdk_pixbuf-2.0.so.0"
+    "libgobject-2.0.so.0"
+    "libglib-2.0.so.0"
+    "libffi.so.6"
+    "libfontconfig.so.1"
+    "libfreetype.so.6"
+)
+
+# Find each library in common system paths and copy it to our 'lib' directory
+for lib in "${LIBS[@]}"; do
+    # Use find to locate the library file. The -print -quit ensures it stops after the first find.
+    find_path=$(find /usr/lib /usr/lib64 -name "$lib" -print -quit)
+    if [ -n "$find_path" ]; then
+        echo "Found $lib at $find_path, copying..."
+        # The -L flag ensures we copy the actual file, not just a symbolic link.
+        cp -L "$find_path" lib/
+    else
+        echo "WARNING: Could not find library $lib. This might cause runtime errors."
+    fi
+done
+
+# List the contents of the packaged 'lib' directory for debugging in the Vercel logs
+echo "--- Contents of the packaged 'lib' directory: ---"
+ls -la lib
 
 # PART 3: Run Django's collectstatic
 echo "--- Collecting Django Static Files ---"
