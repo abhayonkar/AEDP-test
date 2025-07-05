@@ -11,8 +11,8 @@ from .forms import *
 from .models import *
 
 # You need to install WeasyPrint: pip install WeasyPrint
-from weasyprint import HTML
-
+from io import BytesIO
+from xhtml2pdf import pisa
 # -----------------------------------------------------------------------------
 # AUTHENTICATION VIEWS
 # -----------------------------------------------------------------------------
