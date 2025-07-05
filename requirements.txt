@@ -1,8 +1,9 @@
 asgiref==3.9.0
 Django==5.2.4
-pillow==11.3.0
+Pillow==9.5.0
 python-dateutil==2.9.0.post0
 pytz==2025.2
 sqlparse==0.5.3
 tzdata==2025.2
-xhtml2pdf==0.2.14
+reportlab==3.6.12
+xhtml2pdf==0.2.11
