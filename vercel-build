@@ -1,25 +1,31 @@
 #!/bin/bash
 
 # Exit immediately if a command exits with a non-zero status.
-# This helps to catch errors early in the build process.
 set -e
 
-# Log a message to the Vercel build console
-echo "--- Installing WeasyPrint System Dependencies (Comprehensive) ---"
+# PART 1: Install system dependencies in the build environment
+echo "--- Installing WeasyPrint System Dependencies ---"
+yum install -y pango pango-devel cairo cairo-devel gdk-pixbuf2 gdk-pixbuf2-devel libffi-devel
 
-# Update the package manager cache first to ensure we get the latest package lists.
-yum update -y
+# PART 2: Copy the installed libraries into the function's runtime environment
+echo "--- Packaging Shared Libraries ---"
 
-# Use yum (the package manager in Vercel's Amazon Linux environment)
-# to install the system libraries that WeasyPrint depends on.
-# This is a more comprehensive list to include common sub-dependencies.
-yum install -y pango pango-devel cairo cairo-devel libffi-devel gdk-pixbuf2 gdk-pixbuf2-devel libjpeg-turbo libpng
+# Create a 'lib' directory in the root of our project output
+mkdir -p lib
 
-# Log another message
+# Find and copy the required .so files from the system path into our new 'lib' directory.
+# The -L flag ensures we copy the actual file, not just a symbolic link.
+cp -L /usr/lib64/libpango-1.0.so.0 lib/
+cp -L /usr/lib64/libpangocairo-1.0.so.0 lib/
+cp -L /usr/lib64/libpangoft2-1.0.so.0 lib/
+cp -L /usr/lib64/libcairo.so.2 lib/
+cp -L /usr/lib64/libgdk_pixbuf-2.0.so.0 lib/
+cp -L /usr/lib64/libgobject-2.0.so.0 lib/
+cp -L /usr/lib64/libglib-2.0.so.0 lib/
+cp -L /usr/lib64/libffi.so.6 lib/
+cp -L /usr/lib64/libfontconfig.so.1 lib/
+cp -L /usr/lib64/libfreetype.so.6 lib/
+
+# PART 3: Run Django's collectstatic
 echo "--- Collecting Django Static Files ---"
-
-# Run the collectstatic command to gather all static files (CSS, JS, images)
-# into the directory specified by STATIC_ROOT in your settings.py.
-# The --noinput flag prevents any interactive prompts.
-# IMPORTANT: Use the same python version as specified in vercel.json
-python manage.py collectstatic --noinput --clear
+python3.12 manage.py collectstatic --noinput --clear
