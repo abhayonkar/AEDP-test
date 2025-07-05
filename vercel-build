@@ -1,0 +1,20 @@
+#!/bin/bash
+
+# Exit immediately if a command exits with a non-zero status.
+# This helps to catch errors early in the build process.
+set -e
+
+# Log a message to the Vercel build console
+echo "--- Installing WeasyPrint System Dependencies ---"
+
+# Use yum (the package manager in Vercel's Amazon Linux environment)
+# to install the system libraries that WeasyPrint depends on.
+yum install -y pango-devel cairo-devel libffi-devel
+
+# Log another message
+echo "--- Collecting Django Static Files ---"
+
+# Run the collectstatic command to gather all static files (CSS, JS, images)
+# into the directory specified by STATIC_ROOT in your settings.py.
+# The --noinput flag prevents any interactive prompts.
+python3.9 manage.py collectstatic --noinput --clear
