@@ -1,5 +1,8 @@
 {
   "version": 2,
+  "env": {
+    "LD_LIBRARY_PATH": "$LD_LIBRARY_PATH:$LAMBDA_TASK_ROOT/lib"
+  },
   "builds": [
     {
       "src": "aedp_project/wsgi.py",
