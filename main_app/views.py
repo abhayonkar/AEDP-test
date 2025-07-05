@@ -188,7 +188,7 @@ class GenericDeleteView(DeleteView):
 @login_required
 def download_report_view(request, user_id):
     """
-    Generates and serves a PDF report for a given user.
+    Generates and serves a PDF report for a given user using xhtml2pdf.
     Admins can download any user's report.
     Regular users can only download their own report.
     """
@@ -198,7 +198,7 @@ def download_report_view(request, user_id):
 
     target_user = get_object_or_404(User, pk=user_id)
 
-    # Gather all data for the target user
+    # Gather all data for the target user (this part is unchanged)
     context = {
         'user_data': target_user,
         'basic_info': getattr(target_user, 'basic_info', None),
@@ -212,14 +212,19 @@ def download_report_view(request, user_id):
         'timelines': getattr(target_user, 'timelines', None),
     }
 
-    # Render HTML template
+    # Render HTML template to a string
     html_string = render_to_string('main_app/pdf_report.html', context)
-    html = HTML(string=html_string, base_url=request.build_absolute_uri())
 
-    # Generate PDF
-    pdf = html.write_pdf()
+    # Create a PDF file in memory
+    result = BytesIO()
+    pdf = pisa.pisaDocument(BytesIO(html_string.encode("UTF-8")), result)
 
-    # Create HTTP response
-    response = HttpResponse(pdf, content_type='application/pdf')
-    response['Content-Disposition'] = f'attachment; filename="AEDP_Report_{target_user.username}.pdf"'
-    return response
+    if not pdf.err:
+        # If there are no errors, return the PDF as a response
+        response = HttpResponse(result.getvalue(), content_type='application/pdf')
+        response['Content-Disposition'] = f'attachment; filename="AEDP_Report_{target_user.username}.pdf"'
+        return response
+
+    # If there was an error, return an error message
+    return HttpResponse("Error Rendering PDF", status=400)
+
