@@ -4,11 +4,12 @@
 set -e
 
 # Log a message to the Vercel build console
-echo "--- Installing build dependencies for ReportLab ---"
+echo "--- Installing build dependencies for ReportLab (with Freetype) ---"
 
-# Use yum to install the C compiler (gcc) and Python development headers.
-# These are required to compile the C extensions in the ReportLab package.
-yum install -y gcc python3-devel
+# Use yum to install the C compiler, Python development headers,
+# and Freetype development headers. Freetype is crucial for compiling
+# the graphics-related parts of ReportLab (_renderPM).
+yum install -y gcc python3-devel freetype-devel
 
 # Log another message
 echo "--- Collecting Django Static Files ---"
