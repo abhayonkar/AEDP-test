@@ -1,15 +1,15 @@
 {
   "version": 2,
-  "env": {
-    "LD_LIBRARY_PATH": "$LD_LIBRARY_PATH:$LAMBDA_TASK_ROOT/lib"
-  },
   "builds": [
     {
       "src": "aedp_project/wsgi.py",
       "use": "@vercel/python",
       "config": {
         "maxLambdaSize": "15mb",
-        "runtime": "python3.12"
+        "runtime": "python3.12",
+        "env": {
+          "LD_LIBRARY_PATH": "$LD_LIBRARY_PATH:$LAMBDA_TASK_ROOT/lib"
+        }
       }
     }
   ],
