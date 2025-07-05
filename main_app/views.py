@@ -13,7 +13,7 @@ from .models import *
 from fpdf import FPDF, HTMLMixin
 
 # -----------------------------------------------------------------------------
-# PDF Generation Class using fpdf2
+# PDF Generation Class using fpdf2 (Improved)
 # -----------------------------------------------------------------------------
 class PDF(FPDF, HTMLMixin):
     def header(self):
@@ -28,21 +28,49 @@ class PDF(FPDF, HTMLMixin):
 
     def chapter_title(self, title):
         self.set_font('Arial', 'B', 12)
-        self.cell(0, 10, title, 0, 1, 'L')
-        self.ln(2)
+        self.cell(0, 6, title, 0, 1, 'L')
+        self.ln(4)
 
-    def table(self, headers, data):
+    def table(self, headers, data, col_widths):
         self.set_font('Arial', 'B', 8)
-        col_widths = [35] * len(headers) # Adjust column widths as needed
+        # Header
         for i, header in enumerate(headers):
             self.cell(col_widths[i], 7, header, 1, 0, 'C')
         self.ln()
-
+        # Data
         self.set_font('Arial', '', 8)
         for row in data:
+            # Check for page break before drawing a row
+            if self.get_y() + 14 > self.h - self.b_margin: # 14 is approx height of a two-line row
+                self.add_page()
+
+            # Use a consistent height for all cells in a row
+            max_lines = 1
             for i, item in enumerate(row):
-                self.multi_cell(col_widths[i], 7, str(item), 1, 'L')
-            self.ln()
+                lines = self.multi_cell(col_widths[i], 5, str(item), 0, 'L', split_only=True)
+                if len(lines) > max_lines:
+                    max_lines = len(lines)
+            
+            row_height = 5 * max_lines
+            x_start = self.get_x()
+            for i, item in enumerate(row):
+                self.multi_cell(col_widths[i], 5, str(item), 1, 'L')
+                self.set_xy(self.get_x() + col_widths[i], self.get_y() - row_height)
+            
+            self.set_x(x_start) # Reset x position
+            self.ln(row_height)
+
+
+    def key_value_section(self, data_dict):
+        self.set_font('Arial', '', 9)
+        for key, value in data_dict.items():
+            if self.get_y() + 7 > self.h - self.b_margin:
+                self.add_page()
+            self.set_font('Arial', 'B', 9)
+            self.cell(70, 7, f"{key}:", 0, 0, 'L')
+            self.set_font('Arial', '', 9)
+            self.multi_cell(0, 7, str(value), 0, 'L')
+        self.ln()
 
 # -----------------------------------------------------------------------------
 # AUTHENTICATION AND OTHER VIEWS (These are unchanged)
@@ -151,7 +179,7 @@ class GenericDeleteView(DeleteView):
         return super().form_valid(form)
 
 # -----------------------------------------------------------------------------
-# PDF REPORT GENERATION (Updated for fpdf2)
+# PDF REPORT GENERATION (Updated and Complete)
 # -----------------------------------------------------------------------------
 @login_required
 def download_report_view(request, user_id):
@@ -159,7 +187,7 @@ def download_report_view(request, user_id):
         return HttpResponseForbidden("You do not have permission to access this report.")
 
     target_user = get_object_or_404(User, pk=user_id)
-    pdf = PDF('L', 'mm', 'A4')
+    pdf = PDF('L', 'mm', 'A4') # Landscape orientation
     pdf.add_page()
     
     # Basic Info
@@ -177,18 +205,105 @@ def download_report_view(request, user_id):
     pdf.chapter_title('Industry Engagement & MoUs')
     industry_data = target_user.industry_entries.all()
     if industry_data:
-        headers = ['Industry', 'Sector', 'MoU', 'Engagement']
-        rows = [[i.industry_name, i.sector_name, i.mou_signed, i.type_of_engagement] for i in industry_data]
-        pdf.table(headers, rows)
+        headers = ['Industry', 'Sector', 'MoU', 'Engagement', 'Contact', 'Location', 'Programme']
+        rows = [[i.industry_name, i.sector_name, i.mou_signed, i.type_of_engagement, i.contact_person, i.location, i.aedp_programme] for i in industry_data]
+        col_widths = [40, 30, 15, 50, 45, 35, 40]
+        pdf.table(headers, rows, col_widths)
     else:
-        pdf.cell(0, 10, 'No data available.')
-        pdf.ln()
+        pdf.cell(0, 10, 'No data available.'); pdf.ln()
 
-    # Add other sections in a similar way...
-    # (SSC, BOAT, Program, Campus, Outreach, Challenges, Timelines)
+    # SSC Data
+    pdf.chapter_title('Sector Skill Council (SSC) Engagement & MoU')
+    ssc_data = target_user.ssc_entries.all()
+    if ssc_data:
+        headers = ['SSC Name', 'Sector', 'MoU', 'Programme', 'Engagement', 'Contact']
+        rows = [[s.ssc_name, s.sector_name, s.mou_signed, s.aedp_programme, s.type_of_engagement, s.contact_person] for s in ssc_data]
+        col_widths = [45, 40, 15, 45, 60, 50]
+        pdf.table(headers, rows, col_widths)
+    else:
+        pdf.cell(0, 10, 'No data available.'); pdf.ln()
+
+    # BOAT Data
+    pdf.chapter_title('BOAT Collaboration')
+    boat_data = target_user.boat_entries.all()
+    if boat_data:
+        headers = ['Campus/College', 'MoU Signed', 'AEDP Programme', 'Other Information']
+        rows = [[b.campus_college_name, b.mou_signed, b.aedp_programme, b.other_information] for b in boat_data]
+        col_widths = [70, 30, 70, 85]
+        pdf.table(headers, rows, col_widths)
+    else:
+        pdf.cell(0, 10, 'No data available.'); pdf.ln()
+
+    # Program Data
+    pdf.chapter_title('Implementation Progress of Selected AEDP Program')
+    program_data = target_user.program_entries.all()
+    if program_data:
+        headers = ['Program Name', 'Component', 'Status', 'Timeline', 'Remarks']
+        rows = [[p.program_name, p.component, p.status, p.timeline, p.remarks] for p in program_data]
+        col_widths = [60, 50, 30, 45, 70]
+        pdf.table(headers, rows, col_widths)
+    else:
+        pdf.cell(0, 10, 'No data available.'); pdf.ln()
+
+    # Campus Data
+    pdf.chapter_title('AEDP Program Readiness: Campus & College Details')
+    campus_data = target_user.campus_entries.all()
+    if campus_data:
+        headers = ['Campus', 'Programme', 'Curriculum', 'Continued', 'Converted', 'Faculty', 'Duration', 'Intake']
+        rows = [[c.campus_college_name, c.aedp_programme, c.curriculum_type, c.same_aedp_continued, c.existing_degree_converted, c.faculty_department, c.duration, c.student_intake] for c in campus_data]
+        col_widths = [40, 40, 50, 20, 20, 40, 25, 20]
+        pdf.table(headers, rows, col_widths)
+    else:
+        pdf.cell(0, 10, 'No data available.'); pdf.ln()
     
+    pdf.add_page() # New page for non-tabular data
+
+    # Outreach Data
+    pdf.chapter_title('Outreach & Stakeholder Engagement')
+    outreach_data = getattr(target_user, 'outreach', None)
+    if outreach_data:
+        data_dict = {
+            "Nodal Officer Orientation Conducted": outreach_data.nodal_officer_orientation,
+            "No. of Workshops for faculty": outreach_data.faculty_workshops,
+            "No. of Workshops for industry/SSCs": outreach_data.industry_workshops,
+            "District wise Outreach Program conducted": outreach_data.district_outreach_programs,
+            "Parents and other Stakeholder Orientation": outreach_data.parent_orientation,
+            "Total Autonomous Colleges on boarded": outreach_data.autonomous_colleges_onboarded,
+        }
+        pdf.key_value_section(data_dict)
+    else:
+        pdf.cell(0, 10, 'No data available.'); pdf.ln()
+
+    # Challenges Data
+    pdf.chapter_title('Challenges & Risk Mitigation Strategy')
+    challenges_data = getattr(target_user, 'challenges', None)
+    if challenges_data and challenges_data.content:
+        pdf.set_font('Arial', '', 9)
+        pdf.multi_cell(0, 5, challenges_data.content)
+        pdf.ln()
+    else:
+        pdf.cell(0, 10, 'No challenges specified.'); pdf.ln()
+
+    # Timelines Data
+    pdf.chapter_title('Timelines')
+    timelines_data = getattr(target_user, 'timelines', None)
+    if timelines_data:
+        data_dict = {
+            "Finalize curriculum": timelines_data.curriculum_finalization,
+            "Execution of MoUs": timelines_data.mou_execution,
+            "Internal approvals": timelines_data.internal_approvals,
+            "Faculty Orientation": timelines_data.faculty_orientation,
+            "Launch of Admission Campaign": timelines_data.admission_campaign_launch,
+            "Begin Student Enrollment": timelines_data.student_enrollment_begin,
+            "Program Commencement": timelines_data.program_commencement,
+            "Monthly Progress Reporting": timelines_data.monthly_progress_reporting,
+        }
+        pdf.key_value_section(data_dict)
+    else:
+        pdf.cell(0, 10, 'No timeline data available.'); pdf.ln()
+
+    # Generate and return the PDF
     pdf_output = pdf.output(dest='S').encode('latin-1')
     response = HttpResponse(pdf_output, content_type='application/pdf')
     response['Content-Disposition'] = f'attachment; filename="AEDP_Report_{target_user.username}.pdf"'
     return response
-
