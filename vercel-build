@@ -5,15 +5,15 @@
 set -e
 
 # Log a message to the Vercel build console
-echo "--- Installing WeasyPrint System Dependencies ---"
+echo "--- Installing WeasyPrint System Dependencies (Comprehensive) ---"
 
 # Update the package manager cache first to ensure we get the latest package lists.
 yum update -y
 
 # Use yum (the package manager in Vercel's Amazon Linux environment)
 # to install the system libraries that WeasyPrint depends on.
-# We are adding a few more related packages to be thorough.
-yum install -y pango pango-devel cairo cairo-devel libffi-devel
+# This is a more comprehensive list to include common sub-dependencies.
+yum install -y pango pango-devel cairo cairo-devel libffi-devel gdk-pixbuf2 gdk-pixbuf2-devel libjpeg-turbo libpng
 
 # Log another message
 echo "--- Collecting Django Static Files ---"
@@ -22,4 +22,4 @@ echo "--- Collecting Django Static Files ---"
 # into the directory specified by STATIC_ROOT in your settings.py.
 # The --noinput flag prevents any interactive prompts.
 # IMPORTANT: Use the same python version as specified in vercel.json
-python3.12 manage.py collectstatic --noinput --clear
+python manage.py collectstatic --noinput --clear
