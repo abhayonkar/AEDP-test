@@ -8,7 +8,7 @@
         "maxLambdaSize": "15mb",
         "runtime": "python3.12",
         "env": {
-          "LD_LIBRARY_PATH": "$LD_LIBRARY_PATH:$LAMBDA_TASK_ROOT/lib",
+          "LD_LIBRARY_PATH": "/var/task/lib:$LD_LIBRARY_PATH",
           "FONTCONFIG_PATH": "/var/task/.config/fontconfig"
         }
       }
