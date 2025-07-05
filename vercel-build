@@ -3,17 +3,18 @@
 # Exit immediately if a command exits with a non-zero status.
 set -e
 
-# PART 1: Install system dependencies
-echo "--- Installing WeasyPrint System Dependencies ---"
-yum install -y pango pango-devel cairo cairo-devel gdk-pixbuf2 gdk-pixbuf2-devel libffi-devel fontconfig
+# PART 1: Install a more comprehensive set of system dependencies
+echo "--- Installing WeasyPrint System Dependencies (Comprehensive) ---"
+yum install -y pango pango-devel cairo cairo-devel gdk-pixbuf2 gdk-pixbuf2-devel libffi-devel fontconfig fontconfig-devel libjpeg-turbo-devel libpng-devel
 
-# PART 2: Locate and package the required shared libraries
-echo "--- Locating and Packaging Shared Libraries ---"
-
-# Create a 'lib' directory in the project root. This will be packaged with the function.
+# PART 2: Create directories for libraries and font configuration
+echo "--- Creating runtime directories ---"
 mkdir -p lib
+mkdir -p .fonts
+mkdir -p .config/fontconfig
 
-# Define the list of required libraries
+# PART 3: Locate and package a wider range of required shared libraries
+echo "--- Locating and Packaging Shared Libraries ---"
 LIBS=(
     "libpango-1.0.so.0"
     "libpangocairo-1.0.so.0"
@@ -25,25 +26,42 @@ LIBS=(
     "libffi.so.6"
     "libfontconfig.so.1"
     "libfreetype.so.6"
+    "libharfbuzz.so.0" # HarfBuzz is a critical text shaping library often needed by Pango
+    "libpixman-1.so.0"
+    "libexpat.so.1"
 )
 
-# Find each library in common system paths and copy it to our 'lib' directory
 for lib in "${LIBS[@]}"; do
-    # Use find to locate the library file. The -print -quit ensures it stops after the first find.
     find_path=$(find /usr/lib /usr/lib64 -name "$lib" -print -quit)
     if [ -n "$find_path" ]; then
         echo "Found $lib at $find_path, copying..."
-        # The -L flag ensures we copy the actual file, not just a symbolic link.
         cp -L "$find_path" lib/
     else
         echo "WARNING: Could not find library $lib. This might cause runtime errors."
     fi
 done
 
-# List the contents of the packaged 'lib' directory for debugging in the Vercel logs
+# PART 4: Create a custom fontconfig configuration to guide WeasyPrint
+echo "--- Creating custom fontconfig configuration ---"
+cat > fonts.conf << EOL
+<?xml version="1.0"?>
+<!DOCTYPE fontconfig SYSTEM "fonts.dtd">
+<fontconfig>
+  <dir>/usr/share/fonts</dir>
+  <dir>~/.fonts</dir>
+  <dir>$LAMBDA_TASK_ROOT/.fonts</dir>
+  <cachedir>/tmp/fontconfig</cachedir>
+  <config></config>
+</fontconfig>
+EOL
+mv fonts.conf .config/fontconfig/fonts.conf
+
+# PART 5: List contents for debugging in the Vercel logs
 echo "--- Contents of the packaged 'lib' directory: ---"
 ls -la lib
+echo "--- Contents of the fontconfig directory: ---"
+ls -la .config/fontconfig
 
-# PART 3: Run Django's collectstatic
+# PART 6: Run Django's collectstatic
 echo "--- Collecting Django Static Files ---"
 python3.12 manage.py collectstatic --noinput --clear
