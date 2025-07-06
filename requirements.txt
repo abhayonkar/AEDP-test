@@ -1,4 +1,26 @@
-asgiref==3.9.0
+# Django and Server
 Django==5.2.4
-Pillow==9.5.0
-fpdf2==2.7.9
+gunicorn==23.0.0
+whitenoise==6.9.0
+asgiref==3.9.0
+sqlparse==0.5.3
+tzdata==2025.2
+
+# Database
+psycopg2-binary==2.9.10
+dj-database-url==3.0.1
+
+# PDF Generation with WeasyPrint
+weasyprint==65.1
+Pillow==11.3.0
+Brotli==1.1.0
+cffi==1.17.1
+cssselect2==0.8.0
+fonttools==4.58.5
+pydyf==0.11.0
+pyphen==0.17.2
+pycparser==2.22
+tinycss2==1.4.0
+tinyhtml5==2.0.0
+webencodings==0.5.1
+zopfli==0.2.3.post1
