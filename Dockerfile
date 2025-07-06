@@ -32,6 +32,9 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy the rest of your application code into the container
 COPY . /app/
 
+RUN python3 manage.py collectstatic --no-input
+
+
 # Make the entrypoint script executable
 RUN chmod +x /app/entrypoint.sh
 
