@@ -88,11 +88,15 @@ class Industry(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='industry_entries')
     industry_name = models.CharField(max_length=255)
     sector_name = models.CharField(max_length=255)
-    mou_signed = models.CharField(max_length=3, choices=[('Yes', 'Yes'), ('No', 'No')])
-    type_of_engagement = models.CharField(max_length=255)
-    contact_person = models.TextField()
+    mou_signed = models.CharField("MoU Signed Status (Yes/No)", max_length=3, choices=[('Yes', 'Yes'), ('No', 'No')])
+    start_date = models.DateField(blank=True, null=True)
+    validity_date = models.DateField(blank=True, null=True)
+    student_commitment = models.PositiveIntegerField("Student commitment for apprenticeship (no. of students)", default=0)
+    stipend_range = models.CharField(max_length=100, blank=True, null=True)
+    type_of_engagement = models.CharField("Type of Engagement (Curriculum, Apprenticeship, Assessment, Stipend etc.)", max_length=255)
+    contact_person = models.TextField("Contact Person Name, Designation & Contact Details")
     location = models.CharField(max_length=255)
-    aedp_programme = models.CharField(max_length=255)
+    aedp_programme = models.CharField("Title of AEDP Programme", max_length=255)
     other_details = models.TextField(blank=True, null=True)
 
     def __str__(self):
@@ -103,10 +107,12 @@ class SSC(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='ssc_entries')
     ssc_name = models.CharField(max_length=255)
     sector_name = models.CharField(max_length=255)
-    mou_signed = models.CharField(max_length=3, choices=[('Yes', 'Yes'), ('No', 'No')])
-    aedp_programme = models.CharField(max_length=255)
-    type_of_engagement = models.TextField()
-    contact_person = models.TextField()
+    mou_signed = models.CharField("MoU Signed Status (Yes/No)", max_length=3, choices=[('Yes', 'Yes'), ('No', 'No')])
+    start_date = models.DateField(blank=True, null=True)
+    validity_date = models.DateField(blank=True, null=True)
+    aedp_programme = models.CharField("Title of AEDP Programme", max_length=255)
+    type_of_engagement = models.TextField("Type of Engagement of SSC Contact MoU (Curriculum Preparation Assessment, Visiting Faculty, Stipend provision etc.)")
+    contact_person = models.TextField("Contact Person, Designation & Contact Details")
     remarks = models.TextField(blank=True, null=True)
 
     def __str__(self):
@@ -115,9 +121,11 @@ class SSC(models.Model):
 class BOAT(models.Model):
     """Stores a BOAT collaboration entry. A user can have multiple."""
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='boat_entries')
-    campus_college_name = models.CharField(max_length=255)
-    mou_signed = models.CharField(max_length=3, choices=[('Yes', 'Yes'), ('No', 'No')])
-    aedp_programme = models.CharField(max_length=255)
+    campus_college_name = models.CharField("University Campus / College Name", max_length=255)
+    mou_signed = models.CharField("MoU Signed with BOAT (Yes/No)", max_length=3, choices=[('Yes', 'Yes'), ('No', 'No')])
+    aedp_programme = models.CharField("Title of AEDP Programme", max_length=255)
+    no_of_students = models.PositiveIntegerField(default=0)
+    stipend = models.CharField(max_length=100, blank=True, null=True)
     other_information = models.TextField(blank=True, null=True)
 
     def __str__(self):
@@ -125,24 +133,26 @@ class BOAT(models.Model):
 
 class Program(models.Model):
     """Stores an AEDP program implementation progress entry. A user can have multiple."""
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='program_entries')
-    program_name = models.CharField(max_length=255)
-    component = models.CharField(max_length=100, choices=[
-        ('Syllabus Preparation', 'Syllabus Preparation'),
-        ('Credit Allocation', 'Credit Allocation'),
-        ('Board of Deans Approval', 'Board of Deans Approval'),
-        ('Academic Council Approval', 'Academic Council Approval')
-    ])
-    status = models.CharField(max_length=20, choices=[
+    STATUS_CHOICES = [
         ('Completed', 'Completed'),
         ('In Progress', 'In Progress'),
         ('Not Started', 'Not Started')
-    ])
-    timeline = models.CharField(max_length=255)
+    ]
+
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='program_entries')
+    program_name = models.CharField("Program Name", max_length=255)
+    
+    # Status for each of the four steps, as requested
+    syllabus_preparation = models.CharField("Syllabus Preparation", max_length=20, choices=STATUS_CHOICES, default='Not Started')
+    credit_allocation = models.CharField("Credit Allocation", max_length=20, choices=STATUS_CHOICES, default='Not Started')
+    board_of_deans_approval = models.CharField("Board of Deans Approval", max_length=20, choices=STATUS_CHOICES, default='Not Started')
+    academic_council_approval = models.CharField("Academic Council Approval", max_length=20, choices=STATUS_CHOICES, default='Not Started')
+
+    timeline = models.CharField("Timeline (Target Completion date, If pending)", max_length=255, blank=True)
     remarks = models.TextField(blank=True, null=True)
 
     def __str__(self):
-        return f"{self.program_name} ({self.component}) for {self.user.username}"
+        return f"{self.program_name} for {self.user.username}"
 
 class Campus(models.Model):
     """Stores a campus/college details entry. A user can have multiple."""
@@ -150,13 +160,14 @@ class Campus(models.Model):
     campus_college_name = models.CharField(max_length=255)
     aedp_programme = models.CharField(max_length=255)
     curriculum_type = models.TextField()
-    same_aedp_continued = models.CharField(max_length=3, choices=[('Yes', 'Yes'), ('No', 'No')])
-    existing_degree_converted = models.CharField(max_length=3, choices=[('Yes', 'Yes'), ('No', 'No')])
+    same_aedp_continued = models.CharField("Same AEDP (with CRISP & SSC) Continued? (Yes/No)", max_length=3, choices=[('Yes', 'Yes'), ('No', 'No')])
+    existing_degree_converted = models.CharField("Existing Degree Programme Converted to AEDP? (Yes/No)", max_length=3, choices=[('Yes', 'Yes'), ('No', 'No')])
     faculty_department = models.CharField(max_length=255)
-    duration = models.CharField(max_length=20, choices=[('3-Year UG', '3-Year UG'), ('4-Year UG', '4-Year UG')])
-    apprenticeship_integration = models.TextField()
-    student_intake = models.PositiveIntegerField()
-    industry_partners = models.TextField()
+    duration = models.CharField("AEDP Duration (3-Year UG / 4-Year UG)", max_length=20, choices=[('3-Year UG', '3-Year UG'), ('4-Year UG', '4-Year UG')])
+    apprenticeship_integration = models.TextField("Mention the semesters in which apprenticeship is integrated and the total credits allocated.")
+    student_intake = models.PositiveIntegerField("Probable Student Intake")
+    student_enrolled = models.PositiveIntegerField(default=0)
+    industry_partners = models.TextField("Industry Partner(s) Details")
 
     def __str__(self):
         return f"{self.campus_college_name} campus entry for {self.user.username}"

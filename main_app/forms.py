@@ -31,6 +31,10 @@ class IndustryForm(forms.ModelForm):
             'industry_name': forms.TextInput(attrs={'class': 'form-control'}),
             'sector_name': forms.TextInput(attrs={'class': 'form-control'}),
             'mou_signed': forms.Select(attrs={'class': 'form-select'}),
+            'start_date': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
+            'validity_date': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
+            'student_commitment': forms.NumberInput(attrs={'class': 'form-control'}),
+            'stipend_range': forms.TextInput(attrs={'class': 'form-control'}),
             'type_of_engagement': forms.TextInput(attrs={'class': 'form-control'}),
             'contact_person': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
             'location': forms.TextInput(attrs={'class': 'form-control'}),
@@ -46,6 +50,8 @@ class SSCForm(forms.ModelForm):
             'ssc_name': forms.TextInput(attrs={'class': 'form-control'}),
             'sector_name': forms.TextInput(attrs={'class': 'form-control'}),
             'mou_signed': forms.Select(attrs={'class': 'form-select'}),
+            'start_date': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
+            'validity_date': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
             'aedp_programme': forms.TextInput(attrs={'class': 'form-control'}),
             'type_of_engagement': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
             'contact_person': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
@@ -60,6 +66,8 @@ class BOATForm(forms.ModelForm):
             'campus_college_name': forms.TextInput(attrs={'class': 'form-control'}),
             'mou_signed': forms.Select(attrs={'class': 'form-select'}),
             'aedp_programme': forms.TextInput(attrs={'class': 'form-control'}),
+            'no_of_students': forms.NumberInput(attrs={'class': 'form-control'}),
+            'stipend': forms.TextInput(attrs={'class': 'form-control'}),
             'other_information': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
         }
 
@@ -69,12 +77,14 @@ class ProgramForm(forms.ModelForm):
         exclude = ['user']
         widgets = {
             'program_name': forms.TextInput(attrs={'class': 'form-control'}),
-            'component': forms.Select(attrs={'class': 'form-select'}),
-            'status': forms.Select(attrs={'class': 'form-select'}),
+            'syllabus_preparation': forms.Select(attrs={'class': 'form-select'}),
+            'credit_allocation': forms.Select(attrs={'class': 'form-select'}),
+            'board_of_deans_approval': forms.Select(attrs={'class': 'form-select'}),
+            'academic_council_approval': forms.Select(attrs={'class': 'form-select'}),
             'timeline': forms.TextInput(attrs={'class': 'form-control'}),
             'remarks': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
         }
-
+        
 class CampusForm(forms.ModelForm):
     class Meta:
         model = Campus
@@ -89,6 +99,7 @@ class CampusForm(forms.ModelForm):
             'duration': forms.Select(attrs={'class': 'form-select'}),
             'apprenticeship_integration': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
             'student_intake': forms.NumberInput(attrs={'class': 'form-control'}),
+            'student_enrolled': forms.NumberInput(attrs={'class': 'form-control'}),
             'industry_partners': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
         }
 

@@ -14,6 +14,7 @@
         .section { page-break-inside: avoid; }
         .no-data { color: #888; font-style: italic; }
         .header-info { text-align: center; margin-bottom: 20px; }
+        tfoot { font-weight: bold; }
     </style>
 </head>
 <body>
@@ -28,53 +29,159 @@
     <div class="section">
         <h2>Industry Engagement & MoUs</h2>
         {% if industry_data %}
-            <table><thead><tr><th>Industry Name</th><th>Sector</th><th>MoU</th><th>Engagement</th><th>Contact</th><th>Location</th><th>Programme</th><th>Other Details</th></tr></thead>
-            <tbody>{% for item in industry_data %}<tr><td>{{ item.industry_name }}</td><td>{{ item.sector_name }}</td><td>{{ item.mou_signed }}</td><td>{{ item.type_of_engagement }}</td><td>{{ item.contact_person|linebreaksbr }}</td><td>{{ item.location }}</td><td>{{ item.aedp_programme }}</td><td>{{ item.other_details|linebreaksbr }}</td></tr>{% endfor %}</tbody></table>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Industry Name</th>
+                        <th>Sector</th>
+                        <th>MoU</th>
+                        <th>Start Date</th>
+                        <th>Validity Date</th>
+                        <th>Student Commitment</th>
+                        <th>Stipend Range</th>
+                        <th>Engagement</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in industry_data %}
+                    <tr>
+                        <td>{{ item.industry_name }}</td>
+                        <td>{{ item.sector_name }}</td>
+                        <td>{{ item.mou_signed }}</td>
+                        <td>{{ item.start_date|default:"N/A" }}</td>
+                        <td>{{ item.validity_date|default:"N/A" }}</td>
+                        <td>{{ item.student_commitment }}</td>
+                        <td>{{ item.stipend_range|default:"N/A" }}</td>
+                        <td>{{ item.type_of_engagement }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td colspan="5">Total Student Commitment</td>
+                        <td colspan="3">{{ total_student_commitment }}</td>
+                    </tr>
+                </tfoot>
+            </table>
         {% else %}<p class="no-data">No data available.</p>{% endif %}
     </div>
 
     <div class="section">
         <h2>Sector Skill Council (SSC) Engagement & MoU</h2>
         {% if ssc_data %}
-            <table><thead><tr><th>SSC Name</th><th>Sector</th><th>MoU</th><th>Programme</th><th>Engagement</th><th>Contact</th><th>Remarks</th></tr></thead>
-            <tbody>{% for item in ssc_data %}<tr><td>{{ item.ssc_name }}</td><td>{{ item.sector_name }}</td><td>{{ item.mou_signed }}</td><td>{{ item.aedp_programme }}</td><td>{{ item.type_of_engagement|linebreaksbr }}</td><td>{{ item.contact_person|linebreaksbr }}</td><td>{{ item.remarks|linebreaksbr }}</td></tr>{% endfor %}</tbody></table>
+            <table>
+                <thead>
+                    <tr>
+                        <th>SSC Name</th>
+                        <th>Sector</th>
+                        <th>MoU</th>
+                        <th>Start Date</th>
+                        <th>Validity Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in ssc_data %}
+                    <tr>
+                        <td>{{ item.ssc_name }}</td>
+                        <td>{{ item.sector_name }}</td>
+                        <td>{{ item.mou_signed }}</td>
+                        <td>{{ item.start_date|default:"N/A" }}</td>
+                        <td>{{ item.validity_date|default:"N/A" }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
         {% else %}<p class="no-data">No data available.</p>{% endif %}
     </div>
-    
+
     <div class="section">
         <h2>BOAT Collaboration</h2>
         {% if boat_data %}
-            <table><thead><tr><th>Campus/College</th><th>MoU Signed</th><th>AEDP Programme</th><th>Other Information</th></tr></thead>
-            <tbody>{% for item in boat_data %}<tr><td>{{ item.campus_college_name }}</td><td>{{ item.mou_signed }}</td><td>{{ item.aedp_programme }}</td><td>{{ item.other_information|linebreaksbr }}</td></tr>{% endfor %}</tbody></table>
+            <table>
+                <thead>
+                    <tr>
+                        <th>AEDP Programme</th>
+                        <th>No. of Students</th>
+                        <th>Stipend</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in boat_data %}
+                    <tr>
+                        <td>{{ item.aedp_programme }}</td>
+                        <td>{{ item.no_of_students }}</td>
+                        <td>{{ item.stipend|default:"N/A" }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td>Total Students</td>
+                        <td colspan="2">{{ total_boat_students }}</td>
+                    </tr>
+                </tfoot>
+            </table>
         {% else %}<p class="no-data">No data available.</p>{% endif %}
     </div>
 
     <div class="section">
         <h2>Implementation Progress of Selected AEDP Program</h2>
         {% if program_data %}
-            <table><thead><tr><th>Program Name</th><th>Component</th><th>Status</th><th>Timeline</th><th>Remarks</th></tr></thead>
-            <tbody>{% for item in program_data %}<tr><td>{{ item.program_name }}</td><td>{{ item.component }}</td><td>{{ item.status }}</td><td>{{ item.timeline }}</td><td>{{ item.remarks|linebreaksbr }}</td></tr>{% endfor %}</tbody></table>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Program Name</th>
+                        <th>Syllabus Prep.</th>
+                        <th>Credit Alloc.</th>
+                        <th>Deans Approval</th>
+                        <th>Council Approval</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in program_data %}
+                    <tr>
+                        <td>{{ item.program_name }}</td>
+                        <td>{{ item.syllabus_preparation }}</td>
+                        <td>{{ item.credit_allocation }}</td>
+                        <td>{{ item.board_of_deans_approval }}</td>
+                        <td>{{ item.academic_council_approval }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
         {% else %}<p class="no-data">No data available.</p>{% endif %}
     </div>
 
     <div class="section">
         <h2>AEDP Program Readiness: University Campus & College Details</h2>
         {% if campus_data %}
-            <table><thead><tr><th>Campus/College</th><th>Programme</th><th>Curriculum</th><th>Continued</th><th>Converted</th><th>Faculty</th><th>Duration</th><th>Apprenticeship</th><th>Intake</th><th>Partners</th></tr></thead>
-            <tbody>{% for item in campus_data %}<tr><td>{{ item.campus_college_name }}</td><td>{{ item.aedp_programme }}</td><td>{{ item.curriculum_type|linebreaksbr }}</td><td>{{ item.same_aedp_continued }}</td><td>{{ item.existing_degree_converted }}</td><td>{{ item.faculty_department }}</td><td>{{ item.duration }}</td><td>{{ item.apprenticeship_integration|linebreaksbr }}</td><td>{{ item.student_intake }}</td><td>{{ item.industry_partners|linebreaksbr }}</td></tr>{% endfor %}</tbody></table>
-        {% else %}<p class="no-data">No data available.</p>{% endif %}
-    </div>
-
-    <div class="section">
-        <h2>Outreach & Stakeholder Engagement</h2>
-        {% if outreach_data %}
             <table>
-                <tr><th>Nodal Officer Orientation</th><td>{{ outreach_data.nodal_officer_orientation }}</td></tr>
-                <tr><th>Faculty Workshops</th><td>{{ outreach_data.faculty_workshops }}</td></tr>
-                <tr><th>Industry/SSC Workshops</th><td>{{ outreach_data.industry_workshops }}</td></tr>
-                <tr><th>District Outreach Programs</th><td>{{ outreach_data.district_outreach_programs }}</td></tr>
-                <tr><th>Parent/Stakeholder Orientation</th><td>{{ outreach_data.parent_orientation }}</td></tr>
-                <tr><th>Autonomous Colleges Onboarded</th><td>{{ outreach_data.autonomous_colleges_onboarded }}</td></tr>
+                <thead>
+                    <tr>
+                        <th>Campus/College</th>
+                        <th>Programme</th>
+                        <th>Duration</th>
+                        <th>Intake</th>
+                        <th>Enrolled</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in campus_data %}
+                    <tr>
+                        <td>{{ item.campus_college_name }}</td>
+                        <td>{{ item.aedp_programme }}</td>
+                        <td>{{ item.duration }}</td>
+                        <td>{{ item.student_intake }}</td>
+                        <td>{{ item.student_enrolled }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td colspan="4">Total Enrolled Students</td>
+                        <td>{{ total_enrolled_students }}</td>
+                    </tr>
+                </tfoot>
             </table>
         {% else %}<p class="no-data">No data available.</p>{% endif %}
     </div>
@@ -84,20 +191,5 @@
         <p>{{ challenges.content|linebreaksbr|default:"No challenges specified." }}</p>
     </div>
 
-    <div class="section">
-        <h2>Timelines</h2>
-        {% if timelines %}
-            <table>
-                <tr><th>Finalize Curriculum</th><td>{{ timelines.curriculum_finalization }}</td></tr>
-                <tr><th>Execute MoUs</th><td>{{ timelines.mou_execution }}</td></tr>
-                <tr><th>Internal Approvals</th><td>{{ timelines.internal_approvals }}</td></tr>
-                <tr><th>Faculty Orientation</th><td>{{ timelines.faculty_orientation }}</td></tr>
-                <tr><th>Launch Admission Campaign</th><td>{{ timelines.admission_campaign_launch }}</td></tr>
-                <tr><th>Begin Student Enrollment</th><td>{{ timelines.student_enrollment_begin }}</td></tr>
-                <tr><th>Program Commencement</th><td>{{ timelines.program_commencement }}</td></tr>
-                <tr><th>Monthly Progress Reporting</th><td>{{ timelines.monthly_progress_reporting }}</td></tr>
-            </table>
-        {% else %}<p class="no-data">No timeline data available.</p>{% endif %}
-    </div>
 </body>
 </html>

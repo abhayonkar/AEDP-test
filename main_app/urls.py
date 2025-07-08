@@ -9,6 +9,9 @@ urlpatterns = [
     # Dashboard
     path('dashboard/', views.dashboard_view, name='dashboard'),
 
+    # Analysis
+    path('analysis/<int:user_id>/', views.analysis_view, name='analysis'),
+
     # Single-Entry Model Updates
     path('update/basic-info/', views.update_basic_info, name='update_basic_info'),
     path('update/outreach/', views.update_outreach, name='update_outreach'),
@@ -21,27 +24,27 @@ urlpatterns = [
     # --- Generic CRUD URLs for Multi-Entry Models ---
 
     # Industry
-    path('industry/new/', views.GenericCreateView.as_view(form_class=views.IndustryForm, model_name="Industry"), name='industry_create'),
+    path('industry/new/', views.GenericCreateView.as_view(form_class=views.IndustryForm, model=views.Industry), name='industry_create'),
     path('industry/<int:pk>/edit/', views.GenericUpdateView.as_view(model=views.Industry, form_class=views.IndustryForm), name='industry_update'),
     path('industry/<int:pk>/delete/', views.GenericDeleteView.as_view(model=views.Industry), name='industry_delete'),
 
     # SSC
-    path('ssc/new/', views.GenericCreateView.as_view(form_class=views.SSCForm, model_name="SSC"), name='ssc_create'),
+    path('ssc/new/', views.GenericCreateView.as_view(form_class=views.SSCForm, model=views.SSC), name='ssc_create'),
     path('ssc/<int:pk>/edit/', views.GenericUpdateView.as_view(model=views.SSC, form_class=views.SSCForm), name='ssc_update'),
     path('ssc/<int:pk>/delete/', views.GenericDeleteView.as_view(model=views.SSC), name='ssc_delete'),
 
     # BOAT
-    path('boat/new/', views.GenericCreateView.as_view(form_class=views.BOATForm, model_name="BOAT"), name='boat_create'),
+    path('boat/new/', views.GenericCreateView.as_view(form_class=views.BOATForm, model=views.BOAT), name='boat_create'),
     path('boat/<int:pk>/edit/', views.GenericUpdateView.as_view(model=views.BOAT, form_class=views.BOATForm), name='boat_update'),
     path('boat/<int:pk>/delete/', views.GenericDeleteView.as_view(model=views.BOAT), name='boat_delete'),
 
     # Program
-    path('program/new/', views.GenericCreateView.as_view(form_class=views.ProgramForm, model_name="Program"), name='program_create'),
+    path('program/new/', views.GenericCreateView.as_view(form_class=views.ProgramForm, model=views.Program), name='program_create'),
     path('program/<int:pk>/edit/', views.GenericUpdateView.as_view(model=views.Program, form_class=views.ProgramForm), name='program_update'),
     path('program/<int:pk>/delete/', views.GenericDeleteView.as_view(model=views.Program), name='program_delete'),
 
     # Campus
-    path('campus/new/', views.GenericCreateView.as_view(form_class=views.CampusForm, model_name="Campus"), name='campus_create'),
+    path('campus/new/', views.GenericCreateView.as_view(form_class=views.CampusForm, model=views.Campus), name='campus_create'),
     path('campus/<int:pk>/edit/', views.GenericUpdateView.as_view(model=views.Campus, form_class=views.CampusForm), name='campus_update'),
     path('campus/<int:pk>/delete/', views.GenericDeleteView.as_view(model=views.Campus), name='campus_delete'),
 ]

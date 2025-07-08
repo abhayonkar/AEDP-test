@@ -1,9 +1,17 @@
 <div class="form-section" id="boat">
-    <h2 class="section-title"><i class="fas fa-ship me-2"></i>BOAT Collaboration</h2>
+    <h2 class="section-title">
+        <i class="fas fa-ship me-2"></i>BOAT Collaboration
+        <small style="color:red; font-size:smaller;">(fill the data separately for each program)</small>
+    </h2>
     <form method="post" action="{% url 'boat_create' %}">
         {% csrf_token %}
         <div class="row">
-            {% for field in boat_form %}<div class="col-md-6 mb-3"><label class="form-label">{{ field.label }}</label>{{ field }}</div>{% endfor %}
+            {% for field in boat_form %}
+            <div class="col-md-6 mb-3">
+                <label class="form-label">{{ field.label }}</label>
+                {{ field }}
+            </div>
+            {% endfor %}
         </div>
         <button type="submit" class="btn btn-primary">Add BOAT Entry</button>
     </form>
@@ -11,13 +19,35 @@
     <h3 class="h5">Existing Entries</h3>
     <div class="table-responsive">
         <table class="table table-bordered table-striped mt-2">
-            <thead><tr><th>Campus/College</th><th>MoU Signed</th><th>AEDP Programme</th><th>Actions</th></tr></thead>
+            <thead>
+                <tr>
+                    <th>AEDP Programme</th>
+                    <th>No. of Students</th>
+                    <th>Stipend</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
             <tbody>
                 {% for entry in boat_entries %}
-                <tr><td>{{ entry.campus_college_name }}</td><td>{{ entry.mou_signed }}</td><td>{{ entry.aedp_programme }}</td>
-                    <td><a href="{% url 'boat_update' entry.pk %}" class="btn btn-sm btn-warning"><i class="fas fa-edit"></i></a> <a href="{% url 'boat_delete' entry.pk %}" class="btn btn-sm btn-danger"><i class="fas fa-trash"></i></a></td></tr>
-                {% empty %}<tr><td colspan="4" class="text-center">No BOAT data added yet.</td></tr>{% endfor %}
+                <tr>
+                    <td>{{ entry.aedp_programme }}</td>
+                    <td>{{ entry.no_of_students }}</td>
+                    <td>{{ entry.stipend|default:"N/A" }}</td>
+                    <td>
+                        <a href="{% url 'boat_update' entry.pk %}" class="btn btn-sm btn-warning"><i class="fas fa-edit"></i></a>
+                        <a href="{% url 'boat_delete' entry.pk %}" class="btn btn-sm btn-danger"><i class="fas fa-trash"></i></a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="4" class="text-center">No BOAT data added yet.</td></tr>
+                {% endfor %}
             </tbody>
+             <tfoot>
+                <tr>
+                    <td class="text-end"><strong>Total Students:</strong></td>
+                    <td colspan="3"><strong>{{ total_boat_students }}</strong></td>
+                </tr>
+            </tfoot>
         </table>
     </div>
 </div>

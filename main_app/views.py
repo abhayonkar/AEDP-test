@@ -9,6 +9,8 @@ from django.urls import reverse_lazy
 from django.contrib import messages
 from .forms import *
 from .models import *
+from django.db.models import Sum, Avg
+import json
 
 # You need to install WeasyPrint: pip install WeasyPrint
 from weasyprint import HTML
@@ -62,6 +64,11 @@ def dashboard_view(request):
         challenges, _ = Challenges.objects.get_or_create(user=request.user)
         timelines, _ = Timelines.objects.get_or_create(user=request.user)
 
+        # Totals for display
+        total_student_commitment = Industry.objects.filter(user=request.user).aggregate(Sum('student_commitment'))['student_commitment__sum'] or 0
+        total_boat_students = BOAT.objects.filter(user=request.user).aggregate(Sum('no_of_students'))['no_of_students__sum'] or 0
+        total_enrolled_students = Campus.objects.filter(user=request.user).aggregate(Sum('student_enrolled'))['student_enrolled__sum'] or 0
+
         context = {
             # Forms for single-entry models
             'basic_info_form': BasicInfoForm(instance=basic_info),
@@ -82,8 +89,52 @@ def dashboard_view(request):
             'boat_entries': BOAT.objects.filter(user=request.user),
             'program_entries': Program.objects.filter(user=request.user),
             'campus_entries': Campus.objects.filter(user=request.user),
+
+            # Totals
+            'total_student_commitment': total_student_commitment,
+            'total_boat_students': total_boat_students,
+            'total_enrolled_students': total_enrolled_students,
         }
         return render(request, 'main_app/user_dashboard.html', context)
+
+# -----------------------------------------------------------------------------
+# ANALYSIS VIEW
+# -----------------------------------------------------------------------------
+@login_required
+def analysis_view(request, user_id):
+    if not request.user.is_superuser:
+        return HttpResponseForbidden("You do not have permission to access this page.")
+
+    target_user = get_object_or_404(User, pk=user_id)
+    campus_data = Campus.objects.filter(user=target_user)
+    boat_data = BOAT.objects.filter(user=target_user)
+
+    # Chart 1 & 2: Enrollment data
+    enrollment_labels = [entry.aedp_programme for entry in campus_data]
+    enrollment_data = [entry.student_enrolled for entry in campus_data]
+
+    # Chart 3: Stipend data (simple average for demonstration)
+    stipend_labels = [entry.aedp_programme for entry in boat_data]
+    # A simple way to get a numeric value from a string like "5000-8000"
+    stipend_values = []
+    for entry in boat_data:
+        try:
+            # Try to average the range, e.g., "5000-8000" -> 6500
+            parts = [int(p.strip()) for p in entry.stipend.split('-')]
+            stipend_values.append(sum(parts) / len(parts))
+        except (ValueError, AttributeError):
+            # If it's not a range or not a number, default to 0
+            stipend_values.append(0)
+
+
+    context = {
+        'target_user': target_user,
+        'enrollment_labels': json.dumps(enrollment_labels),
+        'enrollment_data': json.dumps(enrollment_data),
+        'stipend_labels': json.dumps(stipend_labels),
+        'stipend_data': json.dumps(stipend_values),
+    }
+    return render(request, 'main_app/analysis.html', context)
 
 # -----------------------------------------------------------------------------
 # SINGLE-ENTRY FORM HANDLING VIEWS
@@ -131,24 +182,21 @@ def update_timelines(request):
 # -----------------------------------------------------------------------------
 # GENERIC VIEWS FOR MULTI-ENTRY MODELS (CREATE, UPDATE, DELETE)
 # -----------------------------------------------------------------------------
-class GenericCreateView(View):
+class GenericCreateView(CreateView):
     """A generic view to handle creation of multi-entry model instances."""
-    form_class = None
+    template_name = 'main_app/generic_form.html'
+    success_url = reverse_lazy('dashboard')
     model_name = ""
 
-    def post(self, request, *args, **kwargs):
-        form = self.form_class(request.POST)
-        if form.is_valid():
-            instance = form.save(commit=False)
-            instance.user = request.user
-            instance.save()
-            messages.success(request, f'{self.model_name} entry added successfully.')
-        else:
-            # Add form errors to messages
-            for field, errors in form.errors.items():
-                for error in errors:
-                    messages.error(request, f"Error in {field}: {error}")
-        return redirect('dashboard')
+    def form_valid(self, form):
+        form.instance.user = self.request.user
+        messages.success(self.request, f'{self.model._meta.verbose_name.title()} entry added successfully.')
+        return super().form_valid(form)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['model_name'] = self.model._meta.verbose_name.title()
+        return context
 
 class GenericUpdateView(UpdateView):
     """A generic view to handle updating multi-entry model instances."""
@@ -156,11 +204,9 @@ class GenericUpdateView(UpdateView):
     success_url = reverse_lazy('dashboard')
 
     def get_queryset(self):
-        # Ensure users can only edit their own objects
         return self.model.objects.filter(user=self.request.user)
 
     def get_context_data(self, **kwargs):
-        # Add the model's verbose name to the context to use in the template
         context = super().get_context_data(**kwargs)
         context['model_name'] = self.model._meta.verbose_name.title()
         return context
@@ -175,7 +221,6 @@ class GenericDeleteView(DeleteView):
     success_url = reverse_lazy('dashboard')
 
     def get_queryset(self):
-        # Ensure users can only delete their own objects
         return self.model.objects.filter(user=self.request.user)
 
     def form_valid(self, form):
@@ -192,34 +237,48 @@ def download_report_view(request, user_id):
     Admins can download any user's report.
     Regular users can only download their own report.
     """
-    # Security check
     if not request.user.is_superuser and request.user.id != user_id:
         return HttpResponseForbidden("You do not have permission to access this report.")
 
     target_user = get_object_or_404(User, pk=user_id)
 
     # Gather all data for the target user
+    industry_data = Industry.objects.filter(user=target_user)
+    boat_data = BOAT.objects.filter(user=target_user)
+    campus_data = Campus.objects.filter(user=target_user)
+
+    # Totals
+    total_student_commitment = industry_data.aggregate(Sum('student_commitment'))['student_commitment__sum'] or 0
+    total_boat_students = boat_data.aggregate(Sum('no_of_students'))['no_of_students__sum'] or 0
+    total_enrolled_students = campus_data.aggregate(Sum('student_enrolled'))['student_enrolled__sum'] or 0
+
+    # Chart data
+    labels = [entry.aedp_programme for entry in campus_data]
+    data = [entry.student_enrolled for entry in campus_data]
+
     context = {
         'user_data': target_user,
         'basic_info': getattr(target_user, 'basic_info', None),
-        'industry_data': target_user.industry_entries.all(),
-        'ssc_data': target_user.ssc_entries.all(),
-        'boat_data': target_user.boat_entries.all(),
-        'program_data': target_user.program_entries.all(),
-        'campus_data': target_user.campus_entries.all(),
+        'industry_data': industry_data,
+        'ssc_data': SSC.objects.filter(user=target_user),
+        'boat_data': boat_data,
+        'program_data': Program.objects.filter(user=target_user),
+        'campus_data': campus_data,
         'outreach_data': getattr(target_user, 'outreach', None),
         'challenges': getattr(target_user, 'challenges', None),
         'timelines': getattr(target_user, 'timelines', None),
+        'total_student_commitment': total_student_commitment,
+        'total_boat_students': total_boat_students,
+        'total_enrolled_students': total_enrolled_students,
+        'chart_labels': json.dumps(labels),
+        'chart_data': json.dumps(data)
     }
 
-    # Render HTML template
     html_string = render_to_string('main_app/pdf_report.html', context)
     html = HTML(string=html_string, base_url=request.build_absolute_uri())
 
-    # Generate PDF
     pdf = html.write_pdf()
 
-    # Create HTTP response
     response = HttpResponse(pdf, content_type='application/pdf')
     response['Content-Disposition'] = f'attachment; filename="AEDP_Report_{target_user.username}.pdf"'
     return response
