@@ -89,11 +89,7 @@ WSGI_APPLICATION = 'aedp_project.wsgi.application'
     
 # }
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
-# # 'default': dj_database_url.config(
-#         # Replace this value with your local database's connection string.
-#         default='postgresql://admin:x4W1TUHJfGgyZhWn25qAK8zdokttCLmQ@dpg-d1l6b63e5dus73fa4epg-a/aedptesting',
-#         conn_max_age=600
-    # )
+
 DATABASES = {
     'default': dj_database_url.config(
         # Replace this value with your local database's connection string.

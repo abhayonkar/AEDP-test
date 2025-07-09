@@ -22,4 +22,29 @@
         </div>
         <button type="submit" class="btn btn-primary">Update Basic Info</button>
     </form>
+
+    <hr class="my-4">
+    <h3 class="h5">Current Information</h3>
+    <div class="table-responsive">
+        <table class="table table-bordered table-striped mt-2">
+            <tbody>
+                <tr>
+                    <th style="width: 30%;">University Name</th>
+                    <td>{{ basic_info.university_name }}</td>
+                </tr>
+                <tr>
+                    <th>PVC Name</th>
+                    <td>{{ basic_info.pvc_name }}</td>
+                </tr>
+                <tr>
+                    <th>Report Date</th>
+                    <td>{{ basic_info.report_date }}</td>
+                </tr>
+                <tr>
+                    <th>Academic Year</th>
+                    <td>{{ basic_info.academic_year }}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
 </div>

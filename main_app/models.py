@@ -93,7 +93,7 @@ class Industry(models.Model):
     validity_date = models.DateField(blank=True, null=True)
     student_commitment = models.PositiveIntegerField("Student commitment for apprenticeship (no. of students)", default=0)
     stipend_range = models.CharField(max_length=100, blank=True, null=True)
-    type_of_engagement = models.CharField("Type of Engagement (Curriculum, Apprenticeship, Assessment, Stipend etc.)", max_length=255)
+    type_of_engagement = models.CharField("Type of Engagement (Curriculum, Apprenticeship, Assessment, Training etc.)", max_length=255)
     contact_person = models.TextField("Contact Person Name, Designation & Contact Details")
     location = models.CharField(max_length=255)
     aedp_programme = models.CharField("Title of AEDP Programme", max_length=255)
@@ -158,7 +158,8 @@ class Campus(models.Model):
     """Stores a campus/college details entry. A user can have multiple."""
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='campus_entries')
     campus_college_name = models.CharField(max_length=255)
-    aedp_programme = models.CharField(max_length=255)
+    aedp_programme = models.CharField("Title of AEDP Programme", max_length=255)
+    sector_name = models.CharField("Sector Name", max_length=255, blank=True, default="")
     curriculum_type = models.TextField()
     same_aedp_continued = models.CharField("Same AEDP (with CRISP & SSC) Continued? (Yes/No)", max_length=3, choices=[('Yes', 'Yes'), ('No', 'No')])
     existing_degree_converted = models.CharField("Existing Degree Programme Converted to AEDP? (Yes/No)", max_length=3, choices=[('Yes', 'Yes'), ('No', 'No')])

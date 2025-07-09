@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+{% load static %}
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -6,24 +7,61 @@
     <style>
         @page { size: A4 landscape; margin: 1cm; }
         body { font-family: sans-serif; color: #333; font-size: 10pt; }
-        h1 { color: #1f3c72; text-align: center; border-bottom: 2px solid #1f3c72; padding-bottom: 10px; }
-        h2 { color: #1f3c72; border-bottom: 1px solid #ccc; padding-bottom: 5px; margin-top: 20px; page-break-before: auto; }
+        
+        .logo-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start; /* changed from center */
+            margin-bottom: 20px;
+            padding: 0; /* remove vertical padding */
+        }
+        
+        .logo-left, .logo-right {
+            width: 240px;   /* doubled */
+            height: 240px;  /* doubled */
+            display: flex;
+            /* Remove align-items and justify-content for tight corners */
+            padding: 0;
+            margin: 0;
+        }
+        
+        .logo-left img, .logo-right img {
+            width: 160px;   /* doubled */
+            height: 160px;  /* doubled */
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+        
+        h1 { color: #1f3c72; text-align: center; border-bottom: 2px solid #1f3c72; padding-bottom: 10px; margin-top: 0; }
+        h2 { color: #325ca8; border-bottom: 1px solid #ccc; padding-bottom: 5px; margin-top: 20px; page-break-before: auto; }
         table { width: 100%; border-collapse: collapse; margin-top: 10px; }
         th, td { border: 1px solid #ddd; padding: 5px; text-align: left; word-wrap: break-word; }
-        th { background-color: #1f3c72; color: white; font-size: 9pt; }
+        th { background-color: #B4D6E3; color: black; font-size: 9pt; }
         .section { page-break-inside: avoid; }
         .no-data { color: #888; font-style: italic; }
         .header-info { text-align: center; margin-bottom: 20px; }
-        tfoot { font-weight: bold; }
+        tfoot tr { background-color: #ffe599; /* light yellow */}
+        tfoot td { font-weight: bold; color: #1f3c72;}
     </style>
 </head>
 <body>
+    <div class="logo-header">
+        <div class="logo-left">
+            <img src="{% static 'Screenshot from 2025-07-09 03-02-35.png' %}" alt="Government of Maharashtra Logo">
+        </div>
+        <div class="logo-right">
+            <img src="{% static 'Screenshot from 2025-07-09 03-02-53.png' %}" alt="Azadi Ka Amrit Mahotsav Logo">
+        </div>
+    </div>
+
     <h1>AEDP Implementation Status & Way Forward</h1>
     <div class="header-info">
-        <h3>Report for: {{ user_data.get_full_name|default:user_data.username }}</h3>
         {% if basic_info %}
-            <p><strong>University:</strong> {{ basic_info.university_name }} | <strong>PVC:</strong> {{ basic_info.pvc_name }} | <strong>Date:</strong> {{ basic_info.report_date|date:"F j, Y" }} | <strong>Academic Year:</strong> {{ basic_info.academic_year }}</p>
-        {% endif %}
+            <p><h2>University:</h2> {{ basic_info.university_name }}</p>
+            <p><h2>PVC:</h2> {{ basic_info.pvc_name }}</p>
+            <p><h2>Date:</h2> {{ basic_info.report_date|date:"F j, Y" }}</p>
+            <p><h2>Academic Year:</h2> {{ basic_info.academic_year }}</p>        {% endif %}
     </div>
 
     <div class="section">
@@ -33,13 +71,17 @@
                 <thead>
                     <tr>
                         <th>Industry Name</th>
-                        <th>Sector</th>
-                        <th>MoU</th>
+                        <th>Sector Name</th>
+                        <th>MoU Signed Status</th>
                         <th>Start Date</th>
                         <th>Validity Date</th>
-                        <th>Student Commitment</th>
+                        
                         <th>Stipend Range</th>
-                        <th>Engagement</th>
+                        <th>Contact Person</th>
+                        <th>Type of AEDP Proramme</th>
+                        <th>Location</th>
+                        <th>Type of Engagement</th>
+                        <th>Student Commitment</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -50,16 +92,20 @@
                         <td>{{ item.mou_signed }}</td>
                         <td>{{ item.start_date|default:"N/A" }}</td>
                         <td>{{ item.validity_date|default:"N/A" }}</td>
-                        <td>{{ item.student_commitment }}</td>
+                        
                         <td>{{ item.stipend_range|default:"N/A" }}</td>
+                        <td>{{ item.contact_person }}</td>
+                        <td>{{ item.aedp_programme }}</td>
+                        <td>{{ item.location }}</td>
                         <td>{{ item.type_of_engagement }}</td>
+                        <td>{{ item.student_commitment }}</td>
                     </tr>
                     {% endfor %}
                 </tbody>
                 <tfoot>
                     <tr>
-                        <td colspan="5">Total Student Commitment</td>
-                        <td colspan="3">{{ total_student_commitment }}</td>
+                        <td colspan="10">Total Student Commitment</td>
+                        <td>{{ total_student_commitment }}</td>
                     </tr>
                 </tfoot>
             </table>
@@ -73,8 +119,8 @@
                 <thead>
                     <tr>
                         <th>SSC Name</th>
-                        <th>Sector</th>
-                        <th>MoU</th>
+                        <th>Sector Name</th>
+                        <th>MoU Signed Status</th>
                         <th>Start Date</th>
                         <th>Validity Date</th>
                     </tr>
@@ -101,23 +147,25 @@
                 <thead>
                     <tr>
                         <th>AEDP Programme</th>
-                        <th>No. of Students</th>
                         <th>Stipend</th>
+                        <th>Remarks</th>
+                        <th>No. of Students</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for item in boat_data %}
                     <tr>
                         <td>{{ item.aedp_programme }}</td>
-                        <td>{{ item.no_of_students }}</td>
                         <td>{{ item.stipend|default:"N/A" }}</td>
+                        <td>{{ item.other_information|default:"N/A" }}</td>
+                        <td>{{ item.no_of_students }}</td>
                     </tr>
                     {% endfor %}
                 </tbody>
                 <tfoot>
                     <tr>
-                        <td>Total Students</td>
-                        <td colspan="2">{{ total_boat_students }}</td>
+                        <td colspan="3">Total Students</td>
+                        <td>{{ total_boat_students }}</td>
                     </tr>
                 </tfoot>
             </table>
@@ -131,10 +179,11 @@
                 <thead>
                     <tr>
                         <th>Program Name</th>
-                        <th>Syllabus Prep.</th>
-                        <th>Credit Alloc.</th>
+                        <th>Syllabus Preparation</th>
+                        <th>Credit Allocation</th>
                         <th>Deans Approval</th>
                         <th>Council Approval</th>
+                        <th>TimeLine</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -145,6 +194,7 @@
                         <td>{{ item.credit_allocation }}</td>
                         <td>{{ item.board_of_deans_approval }}</td>
                         <td>{{ item.academic_council_approval }}</td>
+                        <td>{{ item.timeline }}</td>    
                     </tr>
                     {% endfor %}
                 </tbody>
@@ -185,6 +235,64 @@
             </table>
         {% else %}<p class="no-data">No data available.</p>{% endif %}
     </div>
+
+    
+    <div class="section">
+        <h2>Outreach & Stakeholder Engagement</h2>
+        {% if outreach_data %}
+<div class="section">
+    <table class="table">
+        <tbody>
+            <tr>
+                <th>Nodal Officer Orientation</th>
+                <td>{{ outreach_data.nodal_officer_orientation|default:"N/A" }}</td>
+            </tr>
+            <tr>
+                <th>Faculty Workshops</th>
+                <td>{{ outreach_data.faculty_workshops|default:"0" }}</td>
+            </tr>
+            <tr>
+                <th>Industry Workshops</th>
+                <td>{{ outreach_data.industry_workshops|default:"0" }}</td>
+            </tr>
+            <tr>
+                <th>District Outreach Programs</th>
+                <td>{{ outreach_data.district_outreach_programs|default:"0" }}</td>
+            </tr>
+            <tr>
+                <th>Parent Orientation</th>
+                <td>{{ outreach_data.parent_orientation|default:"0" }}</td>
+            </tr>
+            <tr>
+                <th>Autonomous Colleges Onboarded</th>
+                <td>{{ outreach_data.autonomous_colleges_onboarded|default:"0" }}</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+{% endif %}
+    </div>
+    
+    <div class="section">
+        <h2>Timelines</h2>
+        {% if timelines %}
+            <table>
+                <tbody>
+                    <tr><th>Curriculum Finalization</th><td>{{ timelines.curriculum_finalization|default:"N/A" }}</td></tr>
+                    <tr><th>MoU Execution</th><td>{{ timelines.mou_execution|default:"N/A" }}</td></tr>
+                    <tr><th>Internal Approvals</th><td>{{ timelines.internal_approvals|default:"N/A" }}</td></tr>
+                    <tr><th>Faculty Orientation</th><td>{{ timelines.faculty_orientation|default:"N/A" }}</td></tr>
+                    <tr><th>Admission Campaign Launch</th><td>{{ timelines.admission_campaign_launch|default:"N/A" }}</td></tr>
+                    <tr><th>Student Enrollment Begin</th><td>{{ timelines.student_enrollment_begin|default:"N/A" }}</td></tr>
+                    <tr><th>Program Commencement</th><td>{{ timelines.program_commencement|default:"N/A" }}</td></tr>
+                    <tr><th>Monthly Progress Reporting</th><td>{{ timelines.monthly_progress_reporting|default:"N/A" }}</td></tr>
+                </tbody>
+            </table>
+        {% else %}
+            <p class="no-data">No timelines data available.</p>
+        {% endif %}
+    </div>
+    
 
     <div class="section">
         <h2>Challenges & Risk Mitigation Strategy</h2>

@@ -1,7 +1,7 @@
 <div class="form-section" id="boat">
     <h2 class="section-title">
-        <i class="fas fa-ship me-2"></i>BOAT Collaboration
-        <small style="color:red; font-size:smaller;">(fill the data separately for each program)</small>
+        <i class="fas fa-ship me-2"></i>Board of Apprenticeship Training (BOAT) Collaboration Information
+        <small style="color:red; font-size:smaller;">(Fill the data separately for each program)</small>
     </h2>
     <form method="post" action="{% url 'boat_create' %}">
         {% csrf_token %}
@@ -21,7 +21,7 @@
         <table class="table table-bordered table-striped mt-2">
             <thead>
                 <tr>
-                    <th>AEDP Programme</th>
+                    <th>Title of AEDP Programme</th>
                     <th>No. of Students</th>
                     <th>Stipend</th>
                     <th>Actions</th>

@@ -3,8 +3,46 @@
     <form method="post" action="{% url 'update_outreach' %}">
         {% csrf_token %}
         <div class="row">
-            {% for field in outreach_form %}<div class="col-md-6 mb-3"><label class="form-label">{{ field.label }}</label>{{ field }}</div>{% endfor %}
+            {% for field in outreach_form %}
+            <div class="col-md-6 mb-3">
+                <label class="form-label">{{ field.label }}</label>
+                {{ field }}
+            </div>
+            {% endfor %}
         </div>
         <button type="submit" class="btn btn-primary">Update Outreach Data</button>
     </form>
+
+    <hr class="my-4">
+    <h3 class="h5">Current Information</h3>
+    <div class="table-responsive">
+        <table class="table table-bordered table-striped mt-2">
+            <tbody>
+                <tr>
+                    <th style="width: 40%;">Nodal Officer Orientation</th>
+                    <td>{{ outreach.nodal_officer_orientation }}</td>
+                </tr>
+                <tr>
+                    <th>Faculty Workshops</th>
+                    <td>{{ outreach.faculty_workshops }}</td>
+                </tr>
+                <tr>
+                    <th>Industry Workshops</th>
+                    <td>{{ outreach.industry_workshops }}</td>
+                </tr>
+                <tr>
+                    <th>District Outreach Programs</th>
+                    <td>{{ outreach.district_outreach_programs }}</td>
+                </tr>
+                <tr>
+                    <th>Parent Orientation</th>
+                    <td>{{ outreach.parent_orientation }}</td>
+                </tr>
+                <tr>
+                    <th>Autonomous Colleges Onboarded</th>
+                    <td>{{ outreach.autonomous_colleges_onboarded }}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
 </div>

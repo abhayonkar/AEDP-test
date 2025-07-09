@@ -92,6 +92,7 @@ class CampusForm(forms.ModelForm):
         widgets = {
             'campus_college_name': forms.TextInput(attrs={'class': 'form-control'}),
             'aedp_programme': forms.TextInput(attrs={'class': 'form-control'}),
+            'sector_name': forms.TextInput(attrs={'class': 'form-control'}), # This line was added
             'curriculum_type': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
             'same_aedp_continued': forms.Select(attrs={'class': 'form-select'}),
             'existing_degree_converted': forms.Select(attrs={'class': 'form-select'}),

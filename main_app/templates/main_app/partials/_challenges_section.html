@@ -5,4 +5,16 @@
         {{ challenges_form.as_p }}
         <button type="submit" class="btn btn-primary">Update Challenges</button>
     </form>
+    <hr class="my-4">
+    <h3 class="h5">Current Information</h3>
+    <div class="table-responsive">
+        <table class="table table-bordered table-striped mt-2">
+            <tbody>
+                <tr>
+                    <th>Content</th>
+                    <td>{{ challenges.content|linebreaksbr }}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
 </div>

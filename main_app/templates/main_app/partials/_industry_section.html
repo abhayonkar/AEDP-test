@@ -1,5 +1,6 @@
 <div class="form-section" id="industry">
-    <h2 class="section-title"><i class="fas fa-handshake me-2"></i>Industry Engagement & MoUs</h2>
+    <h2 class="section-title"><i class="fas fa-handshake me-2"></i>Industry Engagement & MoUs
+        <small style="color:red; font-size:smaller;">(Fill the data separately for each Industry & MoUs)</small></h2>
 
     <form method="post" action="{% url 'industry_create' %}">
         {% csrf_token %}
@@ -9,7 +10,7 @@
                 <label class="form-label">
                     {{ field.label }}
                     {% if field.name == 'type_of_engagement' %}
-                        (Curriculum, Apprenticeship, Assessment, Stipend)
+                        <!-- (Curriculum, Apprenticeship, Assessment, Stipend) -->
                     {% endif %}
                 </label>
                 {{ field }}

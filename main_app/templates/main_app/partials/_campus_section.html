@@ -1,17 +1,89 @@
 <div class="form-section" id="campus">
-    <h2 class="section-title"><i class="fas fa-university me-2"></i>Campus & College Details</h2>
+    <h2 class="section-title"><i class="fas fa-university me-2"></i>AEDP Program Readiness : University Campus & College Details 
+        <small style="color:red; font-size:smaller;">(Fill the data separately for each Program)</small></h2>
     <form method="post" action="{% url 'campus_create' %}">
         {% csrf_token %}
+        
+        <!-- Row 1 -->
         <div class="row">
-            {% for field in campus_form %}
             <div class="col-md-6 mb-3">
-                <label class="form-label">{{ field.label }}</label>
-                {{ field }}
+                <label class="form-label">{{ campus_form.campus_college_name.label }}</label>
+                {{ campus_form.campus_college_name }}
             </div>
-            {% endfor %}
+            <div class="col-md-6 mb-3">
+                <label class="form-label">{{ campus_form.aedp_programme.label }}</label>
+                {{ campus_form.aedp_programme }}
+            </div>
         </div>
+
+        <!-- Row 2 -->
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <label class="form-label">{{ campus_form.sector_name.label }}</label>
+                {{ campus_form.sector_name }}
+            </div>
+            <div class="col-md-6 mb-3">
+                <label class="form-label">{{ campus_form.curriculum_type.label }}</label>
+                {{ campus_form.curriculum_type }}
+            </div>
+        </div>
+
+        <!-- Row 3 -->
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <label class="form-label">{{ campus_form.same_aedp_continued.label }}</label>
+                {{ campus_form.same_aedp_continued }}
+            </div>
+            <div class="col-md-6 mb-3">
+                <label class="form-label">{{ campus_form.existing_degree_converted.label }}</label>
+                {{ campus_form.existing_degree_converted }}
+            </div>
+        </div>
+
+        <!-- Row 4 -->
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <label class="form-label">{{ campus_form.faculty_department.label }}</label>
+                {{ campus_form.faculty_department }}
+            </div>
+            <div class="col-md-6 mb-3">
+                <label class="form-label">{{ campus_form.duration.label }}</label>
+                {{ campus_form.duration }}
+            </div>
+        </div>
+
+        <!-- Row 5 -->
+        <div class="row">
+            <div class="col-md-12 mb-3">
+                <label class="form-label">{{ campus_form.apprenticeship_integration.label }}</label>
+                {{ campus_form.apprenticeship_integration }}
+            </div>
+        </div>
+
+        <!-- Row 6 -->
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <label class="form-label">{{ campus_form.student_intake.label }}</label>
+                {{ campus_form.student_intake }}
+            </div>
+            <div class="col-md-6 mb-3">
+                <label class="form-label">{{ campus_form.student_enrolled.label }}</label>
+                {{ campus_form.student_enrolled }}
+            </div>
+        </div>
+
+        <!-- Row 7 -->
+        <div class="row">
+            <div class="col-md-12 mb-3">
+                <label class="form-label">{{ campus_form.industry_partners.label }}</label>
+                {{ campus_form.industry_partners }}
+            </div>
+        </div>
+
         <button type="submit" class="btn btn-primary">Add Campus Entry</button>
     </form>
+    
+    <!-- The table part remains the same -->
     <hr class="my-4">
     <h3 class="h5">Existing Entries</h3>
     <div class="table-responsive">
@@ -20,6 +92,7 @@
                 <tr>
                     <th>Campus/College</th>
                     <th>Programme</th>
+                    <th>Sector Name</th>
                     <th>Duration</th>
                     <th>Intake</th>
                     <th>Student Enrolled</th>
@@ -31,6 +104,7 @@
                 <tr>
                     <td>{{ entry.campus_college_name }}</td>
                     <td>{{ entry.aedp_programme }}</td>
+                    <td>{{ entry.sector_name }}</td>
                     <td>{{ entry.duration }}</td>
                     <td>{{ entry.student_intake }}</td>
                     <td>{{ entry.student_enrolled }}</td>
@@ -40,12 +114,12 @@
                     </td>
                 </tr>
                 {% empty %}
-                <tr><td colspan="6" class="text-center">No Campus data added yet.</td></tr>
+                <tr><td colspan="7" class="text-center">No Campus data added yet.</td></tr>
                 {% endfor %}
             </tbody>
             <tfoot>
                 <tr>
-                    <td colspan="4" class="text-end"><strong>Total Enrolled Students:</strong></td>
+                    <td colspan="5" class="text-end"><strong>Total Enrolled Students:</strong></td>
                     <td colspan="2"><strong>{{ total_enrolled_students }}</strong></td>
                 </tr>
             </tfoot>
