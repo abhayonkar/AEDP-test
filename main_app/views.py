@@ -263,23 +263,10 @@ def download_report_view(request, user_id):
     total_student_commitment = industry_data.aggregate(Sum('student_commitment'))['student_commitment__sum'] or 0
     total_boat_students = boat_data.aggregate(Sum('no_of_students'))['no_of_students__sum'] or 0
     total_enrolled_students = campus_data.aggregate(Sum('student_enrolled'))['student_enrolled__sum'] or 0
-
-    if settings.DEBUG:
-        # In development, Django uses STATICFILES_DIRS
-        static_dir = settings.STATICFILES_DIRS[0]
-    else:
-        # In production (on Render), files are in STATIC_ROOT after `collectstatic`
-        static_dir = settings.STATIC_ROOT
-
-    # Create the full, absolute file path for each logo
-    logo_1_path = os.path.join(static_dir, '1.png')
-    logo_2_path = os.path.join(static_dir, '2.png')
+    
     labels = [entry.aedp_programme for entry in campus_data]
     data = [entry.student_enrolled for entry in campus_data]
     context = {
-        'logo_1_path': logo_1_path,
-        'logo_2_path': logo_2_path,
-
         'user_data': target_user,
         'basic_info': getattr(target_user, 'basic_info', None),
         'industry_data': industry_data,
