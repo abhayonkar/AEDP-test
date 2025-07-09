@@ -284,7 +284,11 @@ def download_report_view(request, user_id):
         'chart_data': json.dumps(data)
     }
     html_string = render_to_string('main_app/pdf_report.html', context)
-    html = HTML(string=html_string, base_url=request.build_absolute_uri())
+    base_url = request.build_absolute_uri('/')
+
+    # Create the WeasyPrint HTML object, providing the base_url
+    # This tells WeasyPrint where to find files like "/static/1.png"
+    html = HTML(string=html_string, base_url=base_url)
     pdf = html.write_pdf()
     response = HttpResponse(pdf, content_type='application/pdf')
     response['Content-Disposition'] = f'attachment; filename="AEDP_Report_{target_user.username}.pdf"'
