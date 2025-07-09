@@ -3,7 +3,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>AEDP Report for {{ user_data.username }}</title>
+    <title>AEDP Report for {{ user_data.first_name }}</title>
     <style>
         @page { size: A4 landscape; margin: 1cm; }
         body { font-family: sans-serif; color: #333; font-size: 10pt; }
@@ -48,10 +48,10 @@
 <body>
     <div class="logo-header">
         <div class="logo-left">
-            <img src="{% static '2.jpg' %}" alt="Government of Maharashtra Logo">
+            <img src="{% static '1.png' %}" alt="Government of Maharashtra Logo">
         </div>
         <div class="logo-right">
-            <img src="{% static '1.jpeg' %}" alt="Azadi Ka Amrit Mahotsav Logo">
+            <img src="{% static '2.png' %}" alt="Azadi Ka Amrit Mahotsav Logo">
         </div>
     </div>
 
@@ -123,7 +123,7 @@
                         <th>MoU Signed Status</th>
                         <th>Start Date</th>
                         <th>Validity Date</th>
-                    </tr>
+                        <th>Title of AEDP Programme</th>      <th>Type of Engagement of MoU</th>   <th>Contact Person</th>              </tr>
                 </thead>
                 <tbody>
                     {% for item in ssc_data %}
@@ -133,7 +133,7 @@
                         <td>{{ item.mou_signed }}</td>
                         <td>{{ item.start_date|default:"N/A" }}</td>
                         <td>{{ item.validity_date|default:"N/A" }}</td>
-                    </tr>
+                        <td>{{ item.aedp_programme }}</td>       <td>{{ item.type_of_engagement }}</td>  <td>{{ item.contact_person }}</td>      </tr>
                     {% endfor %}
                 </tbody>
             </table>
@@ -141,12 +141,12 @@
     </div>
 
     <div class="section">
-        <h2>BOAT Collaboration</h2>
+        <h2>Board of Apprenticeship Training (BOAT) Collaboration</h2>
         {% if boat_data %}
             <table>
                 <thead>
                     <tr>
-                        <th>AEDP Programme</th>
+                        <th>MoU Signed with BOAT (Yes/No)</th>   <th>AEDP Programme</th>
                         <th>Stipend</th>
                         <th>Remarks</th>
                         <th>No. of Students</th>
@@ -155,7 +155,7 @@
                 <tbody>
                     {% for item in boat_data %}
                     <tr>
-                        <td>{{ item.aedp_programme }}</td>
+                        <td>{{ item.mou_signed }}</td>          <td>{{ item.aedp_programme }}</td>
                         <td>{{ item.stipend|default:"N/A" }}</td>
                         <td>{{ item.other_information|default:"N/A" }}</td>
                         <td>{{ item.no_of_students }}</td>
@@ -164,8 +164,7 @@
                 </tbody>
                 <tfoot>
                     <tr>
-                        <td colspan="3">Total Students</td>
-                        <td>{{ total_boat_students }}</td>
+                        <td colspan="4">Total Students</td> <td>{{ total_boat_students }}</td>
                     </tr>
                 </tfoot>
             </table>
