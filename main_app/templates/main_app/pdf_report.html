@@ -48,10 +48,10 @@
 <body>
     <div class="logo-header">
         <div class="logo-left">
-            <img src=". ./static/1.png" alt="Government of Maharashtra Logo">
+            <img src="{% static '1.png' %}" alt="Government of Maharashtra Logo">
         </div>
         <div class="logo-right">
-            <img src=". ./static/2.png" alt="Azadi Ka Amrit Mahotsav Logo">
+            <img src="{% static '2.png' %}" alt="Azadi Ka Amrit Mahotsav Logo">
         </div>
     </div>
 
@@ -123,7 +123,7 @@
                         <th>MoU Signed Status</th>
                         <th>Start Date</th>
                         <th>Validity Date</th>
-                        <th>Title of AEDP Programme</th>      <th>Type of Engagement of MoU</th>   <th>Contact Person</th>              </tr>
+                        <th>Title of AEDP Programme</th>    <th>Type of Engagement of MoU</th>  <th>Contact Person</th>         </tr>
                 </thead>
                 <tbody>
                     {% for item in ssc_data %}
@@ -133,7 +133,7 @@
                         <td>{{ item.mou_signed }}</td>
                         <td>{{ item.start_date|default:"N/A" }}</td>
                         <td>{{ item.validity_date|default:"N/A" }}</td>
-                        <td>{{ item.aedp_programme }}</td>       <td>{{ item.type_of_engagement }}</td>  <td>{{ item.contact_person }}</td>      </tr>
+                        <td>{{ item.aedp_programme }}</td>       <td>{{ item.type_of_engagement }}</td> <td>{{ item.contact_person }}</td>   </tr>
                     {% endfor %}
                 </tbody>
             </table>
@@ -146,7 +146,7 @@
             <table>
                 <thead>
                     <tr>
-                        <th>MoU Signed with BOAT (Yes/No)</th>   <th>AEDP Programme</th>
+                        <th>MoU Signed with BOAT (Yes/No)</th>  <th>AEDP Programme</th>
                         <th>Stipend</th>
                         <th>Remarks</th>
                         <th>No. of Students</th>
@@ -155,7 +155,7 @@
                 <tbody>
                     {% for item in boat_data %}
                     <tr>
-                        <td>{{ item.mou_signed }}</td>          <td>{{ item.aedp_programme }}</td>
+                        <td>{{ item.mou_signed }}</td>         <td>{{ item.aedp_programme }}</td>
                         <td>{{ item.stipend|default:"N/A" }}</td>
                         <td>{{ item.other_information|default:"N/A" }}</td>
                         <td>{{ item.no_of_students }}</td>
@@ -193,7 +193,7 @@
                         <td>{{ item.credit_allocation }}</td>
                         <td>{{ item.board_of_deans_approval }}</td>
                         <td>{{ item.academic_council_approval }}</td>
-                        <td>{{ item.timeline }}</td>    
+                        <td>{{ item.timeline }}</td>   
                     </tr>
                     {% endfor %}
                 </tbody>
