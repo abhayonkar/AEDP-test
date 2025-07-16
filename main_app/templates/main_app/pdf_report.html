@@ -5,300 +5,471 @@
     <meta charset="UTF-8">
     <title>AEDP Report for {{ user_data.first_name }}</title>
     <style>
-        @page { size: A4 landscape; margin: 1cm; }
-        body { font-family: sans-serif; color: #333; font-size: 10pt; }
+        @page { 
+            size: A4 landscape;
+            margin: 1.2cm; /* Reduced margin to give more space for content */
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+        }
         
-        .logo-header {
+        body { 
+            font-family: Arial, sans-serif;
+            color: #333; 
+            font-size: 8.5pt; /* Slightly reduced base font size */
+            margin: 0;
+            padding: 10px;
+            line-height: 1.3;
+            max-width: 100%;
+            box-sizing: border-box;
+        }
+
+        /* Header image styling - Updated */
+        .header-images {
+            width: 100%;
+            position: relative;
+            height: 140px; /* Increased height to accommodate larger images */
+            margin-bottom: 15px;
             display: flex;
             justify-content: space-between;
-            align-items: flex-start; /* changed from center */
-            margin-bottom: 20px;
-            padding: 0; /* remove vertical padding */
+            align-items: flex-start;
         }
-        
-        .logo-left, .logo-right {
-            width: 240px;   /* doubled */
-            height: 240px;  /* doubled */
-            display: flex;
-            /* Remove align-items and justify-content for tight corners */
-            padding: 0;
-            margin: 0;
-        }
-        
-        .logo-left img, .logo-right img {
-            width: 160px;   /* doubled */
-            height: 160px;  /* doubled */
-            max-width: 100%;
-            max-height: 100%;
+
+        .header-images img {
+            height: 130px; /* Increased from 100px to 130px */
+            width: auto;
             object-fit: contain;
         }
+
+        .header-images .left-image {
+            position: absolute;
+            left: 0;
+            top: 0;
+        }
+
+        .header-images .right-image {
+            position: absolute;
+            right: 0;
+            top: 0;
+        }
+
+        /* Container to prevent table overflow */
+        .table-wrapper {
+            width: 100%;
+            overflow-x: hidden; /* Prevent horizontal scroll */
+            margin-bottom: 15px;
+        }
+
+        /* Table base styles */
+        table { 
+            width: 100%;
+            border-collapse: collapse;
+            table-layout: fixed; /* Force fixed table layout */
+            margin: 0;
+            font-size: 8pt;
+        }
+
+        /* Cell base styles */
+        th, td { 
+            border: 1px solid #ddd;
+            padding: 4px 5px; /* Reduced padding */
+            text-align: left;
+            vertical-align: top;
+            overflow: hidden; /* Hide overflow content */
+            word-wrap: break-word;
+            word-break: break-all; /* Break words at any character */
+            max-width: 100%; /* Ensure content doesn't exceed cell width */
+        }
+
+        /* Force text wrapping in cells */
+        .cell-wrap {
+            display: block;
+            overflow-wrap: break-word;
+            word-wrap: break-word;
+            word-break: break-all;
+            hyphens: auto;
+            line-height: 1.2;
+            white-space: normal;
+        }
+
+        /* Additional constraints for industry table */
+        .industry-table {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            max-width: 100%;
+        }
         
-        h1 { color: #1f3c72; text-align: center; border-bottom: 2px solid #1f3c72; padding-bottom: 10px; margin-top: 0; }
-        h2 { color: #325ca8; border-bottom: 1px solid #ccc; padding-bottom: 5px; margin-top: 20px; page-break-before: auto; }
-        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-        th, td { border: 1px solid #ddd; padding: 5px; text-align: left; word-wrap: break-word; }
-        th { background-color: #B4D6E3; color: black; font-size: 9pt; }
-        .section { page-break-inside: avoid; }
-        .no-data { color: #888; font-style: italic; }
-        .header-info { text-align: center; margin-bottom: 20px; }
-        tfoot tr { background-color: #ffe599; /* light yellow */}
-        tfoot td { font-weight: bold; color: #1f3c72;}
+        .industry-table th,
+        .industry-table td {
+            font-size: 7.5pt; /* Even smaller font for industry table */
+            padding: 3px 4px; /* Tighter padding */
+            line-height: 1.1;
+        }
+
+        /* Strict column widths for industry table - Total: 100% */
+        .industry-table th:nth-child(1), .industry-table td:nth-child(1) { width: 11%; } /* Industry */
+        .industry-table th:nth-child(2), .industry-table td:nth-child(2) { width: 6%; }  /* Sector */
+        .industry-table th:nth-child(3), .industry-table td:nth-child(3) { width: 5%; }  /* MoU */
+        .industry-table th:nth-child(4), .industry-table td:nth-child(4) { width: 6%; }  /* Start */
+        .industry-table th:nth-child(5), .industry-table td:nth-child(5) { width: 6%; }  /* Valid */
+        .industry-table th:nth-child(6), .industry-table td:nth-child(6) { width: 7%; }  /* Stipend */
+        .industry-table th:nth-child(7), .industry-table td:nth-child(7) { width: 11%; } /* Contact */
+        .industry-table th:nth-child(8), .industry-table td:nth-child(8) { width: 14%; } /* Programme */
+        .industry-table th:nth-child(9), .industry-table td:nth-child(9) { width: 8%; }  /* Location */
+        .industry-table th:nth-child(10), .industry-table td:nth-child(10) { width: 9%; } /* Engagement */
+        .industry-table th:nth-child(11), .industry-table td:nth-child(11) { width: 7%; } /* Students */
+
+        /* Other table styles */
+        .ssc-table, .boat-table, .program-table, .campus-table {
+            font-size: 8pt;
+        }
+
+        /* Header styling */
+        th { 
+            background-color: #B4D6E3 !important;
+            color: black;
+            font-weight: bold;
+            font-size: 8pt;
+            white-space: normal;
+            padding: 6px 5px;
+        }
+
+        /* Section styling */
+        .section { 
+            margin-bottom: 20px;
+            page-break-inside: avoid;
+        }
+
+        h1 { 
+            color: #1f3c72;
+            text-align: center;
+            border-bottom: 2px solid #1f3c72;
+            padding-bottom: 8px;
+            margin: 0 0 15px 0;
+            font-size: 30pt;
+            font-weight: bold;
+            letter-spacing: 0.5px;
+        }
+
+        h2 { 
+            color: #325ca8;
+            border-bottom: 1px solid #ccc;
+            padding-bottom: 5px;
+            margin: 15px 0 10px 0;
+            font-size: 11pt;
+        }
+
+        /* Print optimizations */
+        @media print {
+            thead { display: table-header-group; }
+            tfoot { display: table-footer-group; }
+            tr { page-break-inside: avoid; }
+            th { background-color: #B4D6E3 !important; }
+            .header-images img {
+                height: 130px !important; /* Ensure images stay large in print */
+            }
+        }
+
+        /* Footer styling */
+        tfoot tr { 
+            background-color: #ffe599 !important;
+        }
+
+        tfoot td { 
+            font-weight: bold;
+            color: #1f3c72;
+        }
+
+        .header-info {
+            margin: 20px 0;
+            line-height: 1.6;
+            text-align: center;
+            font-size: 22pt;
+        }
+
+        .header-info p {
+            margin: 8px 0;
+            font-size: 22pt;
+        }
+
+        .no-data {
+            text-align: center;
+            padding: 10px;
+            font-style: italic;
+            color: #666;
+        }
     </style>
 </head>
 <body>
-<!--     <div class="logo-header">
-        <div class="logo-left">
-            <img src="static/main_app/1.png" alt="Government of Maharashtra Logo">
-        </div>
-        <div class="logo-right">
-            <img src="static/main_app/2.png" alt="Azadi Ka Amrit Mahotsav Logo">
-        </div>
-    </div> -->
-
+    <!-- Image Header Row - Updated
+    <div class="header-images">
+        <img src="{% static 'main_app/gov_maha.png' %}" alt="Gov Maha" class="left-image">
+        <img src="{% static 'main_app/75.png' %}" alt="75" class="right-image">
+    </div>
+     -->
     <h1>AEDP Implementation Status & Way Forward</h1>
+
     <div class="header-info">
         {% if basic_info %}
-            <p><h2>University:</h2> {{ basic_info.university_name }}</p>
-            <p><h2>PVC:</h2> {{ basic_info.pvc_name }}</p>
-            <p><h2>Date:</h2> {{ basic_info.report_date|date:"F j, Y" }}</p>
-            <p><h2>Academic Year:</h2> {{ basic_info.academic_year }}</p>        {% endif %}
+            <p><strong>University:</strong> {{ basic_info.university_name }}</p>
+            <p><strong>PVC:</strong> {{ basic_info.pvc_name }}</p>
+            <p><strong>Date:</strong> {{ basic_info.report_date|date:"F j, Y" }}</p>
+            <p><strong>Academic Year:</strong> {{ basic_info.academic_year }}</p>
+        {% endif %}
     </div>
-
+    <br> 
     <br>
-    <br>
+    <!-- Industry Engagement Section -->
     <div class="section">
         <h2>Industry Engagement & MoUs</h2>
         {% if industry_data %}
-            <table>
-                <thead>
-                    <tr>
-                        <th>Industry Name</th>
-                        <th>Sector Name</th>
-                        <th>MoU Signed Status</th>
-                        <th>Start Date</th>
-                        <th>Validity Date</th>
-                        
-                        <th>Stipend Range</th>
-                        <th>Contact Person</th>
-                        <th>Type of AEDP Proramme</th>
-                        <th>Location</th>
-                        <th>Type of Engagement</th>
-                        <th>Student Commitment</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for item in industry_data %}
-                    <tr>
-                        <td>{{ item.industry_name }}</td>
-                        <td>{{ item.sector_name }}</td>
-                        <td>{{ item.mou_signed }}</td>
-                        <td>{{ item.start_date|default:"N/A" }}</td>
-                        <td>{{ item.validity_date|default:"N/A" }}</td>
-                        
-                        <td>{{ item.stipend_range|default:"N/A" }}</td>
-                        <td>{{ item.contact_person }}</td>
-                        <td>{{ item.aedp_programme }}</td>
-                        <td>{{ item.location }}</td>
-                        <td>{{ item.type_of_engagement }}</td>
-                        <td>{{ item.student_commitment }}</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-                <tfoot>
-                    <tr>
-                        <td colspan="10">Total Student Commitment</td>
-                        <td>{{ total_student_commitment }}</td>
-                    </tr>
-                </tfoot>
-            </table>
-        {% else %}<p class="no-data">No data available.</p>{% endif %}
+            <div class="table-wrapper">
+                <table class="industry-table">
+                    <thead>
+                        <tr>
+                            <th>Industry Name</th>
+                            <th>Sector</th>
+                            <th>MoU</th>
+                            <th>Start</th>
+                            <th>Valid Till</th>
+                            <th>Stipend</th>
+                            <th>Contact Person</th>
+                            <th>AEDP Programme</th>
+                            <th>Location</th>
+                            <th>Engagement</th>
+                            <th>Students</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in industry_data %}
+                        <tr>
+                            <td><span class="cell-wrap">{{ item.industry_name }}</span></td>
+                            <td><span class="cell-wrap">{{ item.sector_name }}</span></td>
+                            <td><span class="cell-wrap">{{ item.mou_signed }}</span></td>
+                            <td><span class="cell-wrap">{{ item.start_date|default:"N/A" }}</span></td>
+                            <td><span class="cell-wrap">{{ item.validity_date|default:"N/A" }}</span></td>
+                            <td><span class="cell-wrap">{{ item.stipend_range|default:"N/A" }}</span></td>
+                            <td><span class="cell-wrap">{{ item.contact_person }}</span></td>
+                            <td><span class="cell-wrap">{{ item.aedp_programme }}</span></td>
+                            <td><span class="cell-wrap">{{ item.location }}</span></td>
+                            <td><span class="cell-wrap">{{ item.type_of_engagement }}</span></td>
+                            <td><span class="cell-wrap">{{ item.student_commitment }}</span></td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <td colspan="10">Total Student Commitment</td>
+                            <td>{{ total_student_commitment }}</td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        {% else %}
+            <p class="no-data">No data available.</p>
+        {% endif %}
     </div>
 
+    <!-- SSC Engagement -->
     <div class="section">
         <h2>Sector Skill Council (SSC) Engagement & MoU</h2>
         {% if ssc_data %}
-            <table>
-                <thead>
-                    <tr>
-                        <th>SSC Name</th>
-                        <th>Sector Name</th>
-                        <th>MoU Signed Status</th>
-                        <th>Start Date</th>
-                        <th>Validity Date</th>
-                        <th>Title of AEDP Programme</th>    <th>Type of Engagement of MoU</th>  <th>Contact Person</th>         </tr>
-                </thead>
-                <tbody>
-                    {% for item in ssc_data %}
-                    <tr>
-                        <td>{{ item.ssc_name }}</td>
-                        <td>{{ item.sector_name }}</td>
-                        <td>{{ item.mou_signed }}</td>
-                        <td>{{ item.start_date|default:"N/A" }}</td>
-                        <td>{{ item.validity_date|default:"N/A" }}</td>
-                        <td>{{ item.aedp_programme }}</td>       <td>{{ item.type_of_engagement }}</td> <td>{{ item.contact_person }}</td>   </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        {% else %}<p class="no-data">No data available.</p>{% endif %}
+            <div class="table-wrapper">
+                <table class="ssc-table">
+                    <thead>
+                        <tr>
+                            <th>SSC Name</th>
+                            <th>Sector</th>
+                            <th>MoU Status</th>
+                            <th>Start Date</th>
+                            <th>Valid Till</th>
+                            <th>AEDP Programme</th>
+                            <th>Engagement</th>
+                            <th>Contact</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in ssc_data %}
+                        <tr>
+                            <td><span class="cell-wrap">{{ item.ssc_name }}</span></td>
+                            <td><span class="cell-wrap">{{ item.sector_name }}</span></td>
+                            <td><span class="cell-wrap">{{ item.mou_signed }}</span></td>
+                            <td><span class="cell-wrap">{{ item.start_date|default:"N/A" }}</span></td>
+                            <td><span class="cell-wrap">{{ item.validity_date|default:"N/A" }}</span></td>
+                            <td><span class="cell-wrap">{{ item.aedp_programme }}</span></td>
+                            <td><span class="cell-wrap">{{ item.type_of_engagement }}</span></td>
+                            <td><span class="cell-wrap">{{ item.contact_person }}</span></td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <p class="no-data">No data available.</p>
+        {% endif %}
     </div>
 
+    <!-- BOAT Section -->
     <div class="section">
         <h2>Board of Apprenticeship Training (BOAT) Collaboration</h2>
         {% if boat_data %}
-            <table>
-                <thead>
-                    <tr>
-                        <th>MoU Signed with BOAT (Yes/No)</th>  <th>AEDP Programme</th>
-                        <th>Stipend</th>
-                        <th>Remarks</th>
-                        <th>No. of Students</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for item in boat_data %}
-                    <tr>
-                        <td>{{ item.mou_signed }}</td>         <td>{{ item.aedp_programme }}</td>
-                        <td>{{ item.stipend|default:"N/A" }}</td>
-                        <td>{{ item.other_information|default:"N/A" }}</td>
-                        <td>{{ item.no_of_students }}</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-                <tfoot>
-                    <tr>
-                        <td colspan="4">Total Students</td> <td>{{ total_boat_students }}</td>
-                    </tr>
-                </tfoot>
-            </table>
-        {% else %}<p class="no-data">No data available.</p>{% endif %}
+            <div class="table-wrapper">
+                <table class="boat-table">
+                    <thead>
+                        <tr>
+                            <th>MoU Status</th>
+                            <th>AEDP Programme</th>
+                            <th>Stipend</th>
+                            <th>Remarks</th>
+                            <th>Students</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in boat_data %}
+                        <tr>
+                            <td><span class="cell-wrap">{{ item.mou_signed }}</span></td>
+                            <td><span class="cell-wrap">{{ item.aedp_programme }}</span></td>
+                            <td><span class="cell-wrap">{{ item.stipend|default:"N/A" }}</span></td>
+                            <td><span class="cell-wrap">{{ item.other_information|default:"N/A" }}</span></td>
+                            <td><span class="cell-wrap">{{ item.no_of_students }}</span></td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <td colspan="4">Total Students</td>
+                            <td>{{ total_boat_students }}</td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        {% else %}
+            <p class="no-data">No data available.</p>
+        {% endif %}
     </div>
 
+    <!-- Program Implementation -->
     <div class="section">
         <h2>Implementation Progress of Selected AEDP Program</h2>
         {% if program_data %}
-            <table>
-                <thead>
-                    <tr>
-                        <th>Program Name</th>
-                        <th>Syllabus Preparation</th>
-                        <th>Credit Allocation</th>
-                        <th>Deans Approval</th>
-                        <th>Council Approval</th>
-                        <th>TimeLine</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for item in program_data %}
-                    <tr>
-                        <td>{{ item.program_name }}</td>
-                        <td>{{ item.syllabus_preparation }}</td>
-                        <td>{{ item.credit_allocation }}</td>
-                        <td>{{ item.board_of_deans_approval }}</td>
-                        <td>{{ item.academic_council_approval }}</td>
-                        <td>{{ item.timeline }}</td>   
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        {% else %}<p class="no-data">No data available.</p>{% endif %}
+            <div class="table-wrapper">
+                <table class="program-table">
+                    <thead>
+                        <tr>
+                            <th>Program</th>
+                            <th>Syllabus</th>
+                            <th>Credits</th>
+                            <th>Deans Approval</th>
+                            <th>Council Approval</th>
+                            <th>Timeline</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in program_data %}
+                        <tr>
+                            <td><span class="cell-wrap">{{ item.program_name }}</span></td>
+                            <td><span class="cell-wrap">{{ item.syllabus_preparation }}</span></td>
+                            <td><span class="cell-wrap">{{ item.credit_allocation }}</span></td>
+                            <td><span class="cell-wrap">{{ item.board_of_deans_approval }}</span></td>
+                            <td><span class="cell-wrap">{{ item.academic_council_approval }}</span></td>
+                            <td><span class="cell-wrap">{{ item.timeline }}</span></td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <p class="no-data">No data available.</p>
+        {% endif %}
     </div>
 
+    <!-- Campus Readiness -->
     <div class="section">
         <h2>AEDP Program Readiness: University Campus & College Details</h2>
         {% if campus_data %}
-            <table>
-                <thead>
-                    <tr>
-                        <th>Campus/College</th>
-                        <th>Programme</th>
-                        <th>Duration</th>
-                        <th>Intake</th>
-                        <th>Enrolled</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for item in campus_data %}
-                    <tr>
-                        <td>{{ item.campus_college_name }}</td>
-                        <td>{{ item.aedp_programme }}</td>
-                        <td>{{ item.duration }}</td>
-                        <td>{{ item.student_intake }}</td>
-                        <td>{{ item.student_enrolled }}</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-                <tfoot>
-                    <tr>
-                        <td colspan="4">Total Enrolled Students</td>
-                        <td>{{ total_enrolled_students }}</td>
-                    </tr>
-                </tfoot>
-            </table>
-        {% else %}<p class="no-data">No data available.</p>{% endif %}
+            <div class="table-wrapper">
+                <table class="campus-table">
+                    <thead>
+                        <tr>
+                            <th>Campus or College</th>
+                            <th>Programme</th>
+                            <th>Duration</th>
+                            <th>Intake</th>
+                            <th>Enrolled</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in campus_data %}
+                        <tr>
+                            <td title="{{ item.campus_college_name }}"><span class="cell-wrap">{{ item.campus_college_name }}</span></td>
+                            <td title="{{ item.aedp_programme }}"><span class="cell-wrap">{{ item.aedp_programme }}</span></td>
+                            <td><span class="cell-wrap">{{ item.duration }}</span></td>
+                            <td><span class="cell-wrap">{{ item.student_intake }}</span></td>
+                            <td><span class="cell-wrap">{{ item.student_enrolled }}</span></td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <td colspan="4">Total Enrolled Students</td>
+                            <td>{{ total_enrolled_students }}</td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        {% else %}
+            <p class="no-data">No data available.</p>
+        {% endif %}
     </div>
 
-    
+    <!-- Outreach -->
     <div class="section">
         <h2>Outreach & Stakeholder Engagement</h2>
         {% if outreach_data %}
-<div class="section">
-    <table class="table">
-        <tbody>
-            <tr>
-                <th>Nodal Officer Orientation</th>
-                <td>{{ outreach_data.nodal_officer_orientation|default:"N/A" }}</td>
-            </tr>
-            <tr>
-                <th>Faculty Workshops</th>
-                <td>{{ outreach_data.faculty_workshops|default:"0" }}</td>
-            </tr>
-            <tr>
-                <th>Industry Workshops</th>
-                <td>{{ outreach_data.industry_workshops|default:"0" }}</td>
-            </tr>
-            <tr>
-                <th>District Outreach Programs</th>
-                <td>{{ outreach_data.district_outreach_programs|default:"0" }}</td>
-            </tr>
-            <tr>
-                <th>Parent Orientation</th>
-                <td>{{ outreach_data.parent_orientation|default:"0" }}</td>
-            </tr>
-            <tr>
-                <th>Autonomous Colleges Onboarded</th>
-                <td>{{ outreach_data.autonomous_colleges_onboarded|default:"0" }}</td>
-            </tr>
-        </tbody>
-    </table>
-</div>
-{% endif %}
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr><th>Activity</th><th>Count / Status</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>Nodal Officer Orientation</td><td>{{ outreach_data.nodal_officer_orientation|default:"N/A" }}</td></tr>
+                        <tr><td>Faculty Workshops</td><td>{{ outreach_data.faculty_workshops|default:"0" }}</td></tr>
+                        <tr><td>Industry Workshops</td><td>{{ outreach_data.industry_workshops|default:"0" }}</td></tr>
+                        <tr><td>District Outreach Programs</td><td>{{ outreach_data.district_outreach_programs|default:"0" }}</td></tr>
+                        <tr><td>Parent Orientation</td><td>{{ outreach_data.parent_orientation|default:"0" }}</td></tr>
+                        <tr><td>Autonomous Colleges Onboarded</td><td>{{ outreach_data.autonomous_colleges_onboarded|default:"0" }}</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        {% endif %}
     </div>
-    
+
+    <!-- Timelines -->
     <div class="section">
         <h2>Timelines</h2>
         {% if timelines %}
-            <table>
-                <tbody>
-                    <tr><th>Curriculum Finalization</th><td>{{ timelines.curriculum_finalization|default:"N/A" }}</td></tr>
-                    <tr><th>MoU Execution</th><td>{{ timelines.mou_execution|default:"N/A" }}</td></tr>
-                    <tr><th>Internal Approvals</th><td>{{ timelines.internal_approvals|default:"N/A" }}</td></tr>
-                    <tr><th>Faculty Orientation</th><td>{{ timelines.faculty_orientation|default:"N/A" }}</td></tr>
-                    <tr><th>Admission Campaign Launch</th><td>{{ timelines.admission_campaign_launch|default:"N/A" }}</td></tr>
-                    <tr><th>Student Enrollment Begin</th><td>{{ timelines.student_enrollment_begin|default:"N/A" }}</td></tr>
-                    <tr><th>Program Commencement</th><td>{{ timelines.program_commencement|default:"N/A" }}</td></tr>
-                    <tr><th>Monthly Progress Reporting</th><td>{{ timelines.monthly_progress_reporting|default:"N/A" }}</td></tr>
-                </tbody>
-            </table>
-        {% else %}
-            <p class="no-data">No timelines data available.</p>
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr><th>Activity</th><th>Planned Date</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>Curriculum Finalization</td><td>{{ timelines.curriculum_finalization|default:"N/A" }}</td></tr>
+                        <tr><td>MoU Execution</td><td>{{ timelines.mou_execution|default:"N/A" }}</td></tr>
+                        <tr><td>Internal Approvals</td><td>{{ timelines.internal_approvals|default:"N/A" }}</td></tr>
+                        <tr><td>Faculty Orientation</td><td>{{ timelines.faculty_orientation|default:"N/A" }}</td></tr>
+                        <tr><td>Admission Campaign Launch</td><td>{{ timelines.admission_campaign_launch|default:"N/A" }}</td></tr>
+                        <tr><td>Student Enrollment Begin</td><td>{{ timelines.student_enrollment_begin|default:"N/A" }}</td></tr>
+                        <tr><td>Program Commencement</td><td>{{ timelines.program_commencement|default:"N/A" }}</td></tr>
+                        <tr><td>Monthly Progress Reporting</td><td>{{ timelines.monthly_progress_reporting|default:"N/A" }}</td></tr>
+                    </tbody>
+                </table>
+            </div>
         {% endif %}
     </div>
-    
-
     <div class="section">
         <h2>Challenges & Risk Mitigation Strategy</h2>
         <p>{{ challenges.content|linebreaksbr|default:"No challenges specified." }}</p>
     </div>
-
 </body>
 </html>
