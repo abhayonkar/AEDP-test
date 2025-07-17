@@ -19,6 +19,14 @@
                 <label class="form-label">Academic Year</label>
                 {{ basic_info_form.academic_year }}
             </div>
+            <div class="col-md-6 mb-3">
+                <label class="form-label">District</label>
+                {{ basic_info_form.district }}
+            </div>
+            <div class="col-md-6 mb-3">
+                <label class="form-label">AISHE Code</label>
+                {{ basic_info_form.aishe_code }}
+            </div>
         </div>
         <button type="submit" class="btn btn-primary">Update Basic Info</button>
     </form>
@@ -35,6 +43,14 @@
                 <tr>
                     <th>PVC Name</th>
                     <td>{{ basic_info.pvc_name }}</td>
+                </tr>
+                <tr>
+                    <th>District</th>
+                    <td>{{ basic_info.district }}</td>
+                </tr>
+                <tr>
+                    <th>AISHE Code</th>
+                    <td>{{ basic_info.aishe_code }}</td>
                 </tr>
                 <tr>
                     <th>Report Date</th>

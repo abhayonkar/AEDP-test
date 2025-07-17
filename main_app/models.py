@@ -33,6 +33,8 @@ def create_or_update_user_profile(sender, instance, created, **kwargs):
 # -----------------------------------------------------------------------------
 # SINGLE-ENTRY MODELS (One per user)
 # -----------------------------------------------------------------------------
+# ...existing code...
+
 class BasicInfo(models.Model):
     """Stores the basic report information for a user."""
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='basic_info')
@@ -40,9 +42,13 @@ class BasicInfo(models.Model):
     pvc_name = models.CharField(max_length=255, default="Default PVC")
     report_date = models.DateField(default=date.today)
     academic_year = models.CharField(max_length=10, default="2024-25")
+    district = models.CharField(max_length=64, default="Ahmednagar")  # <-- Added field
+    aishe_code = models.CharField(max_length=20, blank=True, default="")  # <-- Added field
 
     def __str__(self):
         return f"Basic Info for {self.user.username}"
+
+# ...existing code...
 
 class Outreach(models.Model):
     """Stores the outreach and stakeholder engagement data for a user."""
@@ -95,7 +101,7 @@ class Industry(models.Model):
     stipend_range = models.CharField(max_length=100, blank=True, null=True)
     type_of_engagement = models.CharField("Type of Engagement (Curriculum, Apprenticeship, Assessment, Training etc.)", max_length=255)
     contact_person = models.TextField("Contact Person Name, Designation & Contact Details")
-    location = models.CharField(max_length=255)
+    location_head = models.CharField(max_length=255)
     aedp_programme = models.CharField("Title of AEDP Programme", max_length=255)
     other_details = models.TextField(blank=True, null=True)
 

@@ -13,9 +13,59 @@ class LoginForm(forms.Form):
 # -----------------------------------------------------------------------------
 
 class BasicInfoForm(forms.ModelForm):
+    DISTRICT_CHOICES = [
+        ('Ahmednagar', 'Ahmednagar'),
+        ('Akola', 'Akola'),
+        ('Amravati', 'Amravati'),
+        ('Aurangabad (Chhatrapati Sambhajinagar)', 'Aurangabad (Chhatrapati Sambhajinagar)'),
+        ('Beed', 'Beed'),
+        ('Bhandara', 'Bhandara'),
+        ('Buldhana', 'Buldhana'),
+        ('Chandrapur', 'Chandrapur'),
+        ('Dhule', 'Dhule'),
+        ('Gadchiroli', 'Gadchiroli'),
+        ('Gondia', 'Gondia'),
+        ('Hingoli', 'Hingoli'),
+        ('Jalgaon', 'Jalgaon'),
+        ('Jalna', 'Jalna'),
+        ('Kolhapur', 'Kolhapur'),
+        ('Latur', 'Latur'),
+        ('Mumbai City', 'Mumbai City'),
+        ('Mumbai Suburban', 'Mumbai Suburban'),
+        ('Nagpur', 'Nagpur'),
+        ('Nanded', 'Nanded'),
+        ('Nandurbar', 'Nandurbar'),
+        ('Nashik', 'Nashik'),
+        ('Osmanabad', 'Osmanabad'),
+        ('Palghar', 'Palghar'),
+        ('Parbhani', 'Parbhani'),
+        ('Pune', 'Pune'),
+        ('Raigad', 'Raigad'),
+        ('Ratnagiri', 'Ratnagiri'),
+        ('Sangli', 'Sangli'),
+        ('Satara', 'Satara'),
+        ('Sindhudurg', 'Sindhudurg'),
+        ('Solapur', 'Solapur'),
+        ('Thane', 'Thane'),
+        ('Wardha', 'Wardha'),
+        ('Washim', 'Washim'),
+        ('Yavatmal', 'Yavatmal'),
+    ]
+
+    district = forms.ChoiceField(
+        choices=DISTRICT_CHOICES,
+        widget=forms.Select(attrs={'class': 'form-select'}),
+        label="District"
+    )
+    aishe_code = forms.CharField(
+        max_length=20,
+        widget=forms.TextInput(attrs={'class': 'form-control'}),
+        label="AISHE Code"
+    )
+
     class Meta:
         model = BasicInfo
-        fields = ['university_name', 'pvc_name', 'report_date', 'academic_year']
+        fields = ['university_name', 'pvc_name', 'report_date', 'academic_year', 'district', 'aishe_code']
         widgets = {
             'university_name': forms.TextInput(attrs={'class': 'form-control'}),
             'pvc_name': forms.TextInput(attrs={'class': 'form-control'}),
@@ -37,7 +87,7 @@ class IndustryForm(forms.ModelForm):
             'stipend_range': forms.TextInput(attrs={'class': 'form-control'}),
             'type_of_engagement': forms.TextInput(attrs={'class': 'form-control'}),
             'contact_person': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
-            'location': forms.TextInput(attrs={'class': 'form-control'}),
+            'location_head': forms.TextInput(attrs={'class': 'form-control'}),
             'aedp_programme': forms.TextInput(attrs={'class': 'form-control'}),
             'other_details': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
         }
