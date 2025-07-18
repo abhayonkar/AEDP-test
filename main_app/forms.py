@@ -80,17 +80,20 @@ class IndustryForm(forms.ModelForm):
         widgets = {
             'industry_name': forms.TextInput(attrs={'class': 'form-control'}),
             'sector_name': forms.TextInput(attrs={'class': 'form-control'}),
-            'mou_signed': forms.Select(attrs={'class': 'form-select'}),
+            'type_of_engagement': forms.TextInput(attrs={'class': 'form-control'}),
+            'aedp_programme': forms.TextInput(attrs={'class': 'form-control'}),
             'start_date': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
             'validity_date': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
+            'mou_signed': forms.Select(attrs={'class': 'form-select'}),
+            # 'curriculum_consulted': forms.Select(attrs={'class': 'form-select'}),
             'student_commitment': forms.NumberInput(attrs={'class': 'form-control'}),
             'stipend_range': forms.TextInput(attrs={'class': 'form-control'}),
-            'type_of_engagement': forms.TextInput(attrs={'class': 'form-control'}),
             'contact_person': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
             'location_head': forms.TextInput(attrs={'class': 'form-control'}),
-            'aedp_programme': forms.TextInput(attrs={'class': 'form-control'}),
+            'location_other': forms.TextInput(attrs={'class': 'form-control'}),
             'other_details': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
         }
+
 
 class SSCForm(forms.ModelForm):
     class Meta:
@@ -126,12 +129,14 @@ class ProgramForm(forms.ModelForm):
         model = Program
         exclude = ['user']
         widgets = {
-            'program_name': forms.TextInput(attrs={'class': 'form-control'}),
+            'program': forms.Select(attrs={'class': 'form-select'}),
+            'specialization': forms.TextInput(attrs={'class': 'form-control'}),
             'syllabus_preparation': forms.Select(attrs={'class': 'form-select'}),
             'credit_allocation': forms.Select(attrs={'class': 'form-select'}),
             'board_of_deans_approval': forms.Select(attrs={'class': 'form-select'}),
             'academic_council_approval': forms.Select(attrs={'class': 'form-select'}),
             'timeline': forms.TextInput(attrs={'class': 'form-control'}),
+            'document': forms.FileInput(attrs={'class': 'form-control'}),
             'remarks': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
         }
         

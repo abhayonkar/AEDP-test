@@ -94,15 +94,17 @@ class Industry(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='industry_entries')
     industry_name = models.CharField(max_length=255)
     sector_name = models.CharField(max_length=255)
-    mou_signed = models.CharField("MoU Signed Status (Yes/No)", max_length=3, choices=[('Yes', 'Yes'), ('No', 'No')])
+    type_of_engagement = models.CharField("Type of Engagement (Curriculum, Apprenticeship, Assessment, Training etc.)", max_length=255)
+    aedp_programme = models.CharField("Title of AEDP Programme", max_length=255)
     start_date = models.DateField(blank=True, null=True)
     validity_date = models.DateField(blank=True, null=True)
+    mou_signed = models.CharField("MoU Signed Status (Yes/No)", max_length=3, choices=[('Yes', 'Yes'), ('No', 'No')])
+    curriculum_consulted = models.CharField("Curriculum Consulted", max_length=3, choices=[('Yes', 'Yes'), ('No', 'No')])
     student_commitment = models.PositiveIntegerField("Student commitment for apprenticeship (no. of students)", default=0)
     stipend_range = models.CharField(max_length=100, blank=True, null=True)
-    type_of_engagement = models.CharField("Type of Engagement (Curriculum, Apprenticeship, Assessment, Training etc.)", max_length=255)
     contact_person = models.TextField("Contact Person Name, Designation & Contact Details")
-    location_head = models.CharField(max_length=255)
-    aedp_programme = models.CharField("Title of AEDP Programme", max_length=255)
+    location_head = models.CharField("Head Office Location", max_length=255)
+    location_other = models.CharField("Other Location", max_length=255, blank=True, null=True)
     other_details = models.TextField(blank=True, null=True)
 
     def __str__(self):
@@ -138,27 +140,38 @@ class BOAT(models.Model):
         return f"{self.campus_college_name} BOAT entry for {self.user.username}"
 
 class Program(models.Model):
-    """Stores an AEDP program implementation progress entry. A user can have multiple."""
     STATUS_CHOICES = [
         ('Completed', 'Completed'),
         ('In Progress', 'In Progress'),
         ('Not Started', 'Not Started')
     ]
+    
+    PROGRAM_CHOICES = [
+        ('B.Sc', 'B.Sc'),
+        ('BBA', 'BBA'),
+        ('B.Com', 'B.Com'),
+        ('B.E', 'B.E'),
+        ('B.Tech', 'B.Tech'),
+        ('M.Sc', 'M.Sc'),
+        ('M.Tech', 'M.Tech'),
+        ('M.Com', 'M.Com'),
+        ('MBA', 'MBA'),
+        ('Other', 'Other')
+    ]
 
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='program_entries')
-    program_name = models.CharField("Program Name", max_length=255)
-    
-    # Status for each of the four steps, as requested
+    program = models.CharField("Program", max_length=10, choices=PROGRAM_CHOICES)
+    specialization = models.CharField("Specialization/Branch", max_length=255)
     syllabus_preparation = models.CharField("Syllabus Preparation", max_length=20, choices=STATUS_CHOICES, default='Not Started')
     credit_allocation = models.CharField("Credit Allocation", max_length=20, choices=STATUS_CHOICES, default='Not Started')
     board_of_deans_approval = models.CharField("Board of Deans Approval", max_length=20, choices=STATUS_CHOICES, default='Not Started')
     academic_council_approval = models.CharField("Academic Council Approval", max_length=20, choices=STATUS_CHOICES, default='Not Started')
-
     timeline = models.CharField("Timeline (Target Completion date, If pending)", max_length=255, blank=True)
+    document = models.FileField("Upload Document", upload_to='program_documents/', blank=True, null=True)
     remarks = models.TextField(blank=True, null=True)
 
     def __str__(self):
-        return f"{self.program_name} for {self.user.username}"
+        return f"{self.program} - {self.specialization} for {self.user.username}"
 
 class Campus(models.Model):
     """Stores a campus/college details entry. A user can have multiple."""
