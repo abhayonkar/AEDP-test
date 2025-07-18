@@ -6,6 +6,23 @@ from .models import (
     Outreach, Challenges, Timelines
 )
 
+from django.utils.html import format_html
+
+
+class ProgramAdmin(admin.ModelAdmin):
+    list_display = ['program_name', 'degree', 'specialization', 'curriculum_download']
+    search_fields = ['program_name', 'degree', 'specialization']
+    
+    def curriculum_download(self, obj):
+        if obj.curriculum_file:
+            return format_html(
+                '<a href="{}" class="button" target="_blank">Download Curriculum</a>',
+                reverse('download_curriculum', args=[obj.id])
+            )
+        return "No file available"
+    curriculum_download.short_description = 'Curriculum'
+
+
 # Define an inline admin descriptor for UserProfile model
 # which acts a bit like a singleton
 class UserProfileInline(admin.StackedInline):

@@ -77,10 +77,21 @@ class IndustryForm(forms.ModelForm):
     class Meta:
         model = Industry
         exclude = ['user']
+        fields = [
+            'industry_name', 'sector_name', 'mou_signed', 'curriculum_consulted_to_industry',
+            'aedp_programme', 'start_date', 'validity_date',
+            'student_commitment', 'stipend_range', 'type_of_engagement',
+            'contact_person', 'location_head', 'other_locations', 'other_details'
+        ]
+        # Added ordering to the Meta class
+        # This will ensure that the fields are displayed in the specified order in the form
+        ordering = ['curriculum_consulted_to_industry','location_head', 'other_locations'] 
         widgets = {
             'industry_name': forms.TextInput(attrs={'class': 'form-control'}),
             'sector_name': forms.TextInput(attrs={'class': 'form-control'}),
             'mou_signed': forms.Select(attrs={'class': 'form-select'}),
+            'curriculum_consulted_to_industry': forms.Select(attrs={'class': 'form-select'}),
+            'aedp_programme': forms.TextInput(attrs={'class': 'form-control'}),
             'start_date': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
             'validity_date': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
             'student_commitment': forms.NumberInput(attrs={'class': 'form-control'}),
@@ -88,8 +99,9 @@ class IndustryForm(forms.ModelForm):
             'type_of_engagement': forms.TextInput(attrs={'class': 'form-control'}),
             'contact_person': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
             'location_head': forms.TextInput(attrs={'class': 'form-control'}),
-            'aedp_programme': forms.TextInput(attrs={'class': 'form-control'}),
+            'other_locations': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
             'other_details': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
+            
         }
 
 class SSCForm(forms.ModelForm):
@@ -126,7 +138,16 @@ class ProgramForm(forms.ModelForm):
         model = Program
         exclude = ['user']
         widgets = {
-            'program_name': forms.TextInput(attrs={'class': 'form-control'}),
+            'program_name': forms.Select(attrs={'class': 'form-select'}),
+            'other_degree': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Please specify the degree'
+            }),
+            'specialization': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Enter specialization/branch'
+            }),
+            'curriculum_file': forms.FileInput(attrs={'class': 'form-control'}),
             'syllabus_preparation': forms.Select(attrs={'class': 'form-select'}),
             'credit_allocation': forms.Select(attrs={'class': 'form-select'}),
             'board_of_deans_approval': forms.Select(attrs={'class': 'form-select'}),
@@ -134,7 +155,11 @@ class ProgramForm(forms.ModelForm):
             'timeline': forms.TextInput(attrs={'class': 'form-control'}),
             'remarks': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
         }
-        
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Make the other_degree field appear only when 'Others' is selected
+        self.fields['other_degree'].widget.attrs['style'] = 'display: none;'
 class CampusForm(forms.ModelForm):
     class Meta:
         model = Campus

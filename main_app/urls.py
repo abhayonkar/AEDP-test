@@ -1,5 +1,8 @@
 from django.urls import path
 from . import views
+from django.conf import settings
+from django.conf.urls.static import static
+
 
 urlpatterns = [
     # Authentication
@@ -42,9 +45,10 @@ urlpatterns = [
     path('program/new/', views.ProgramCreateView.as_view(), name='program_create'),
     path('program/<int:pk>/edit/', views.ProgramUpdateView.as_view(), name='program_update'),
     path('program/<int:pk>/delete/', views.ProgramDeleteView.as_view(), name='program_delete'),
+    path('download-curriculum/<int:program_id>/', views.download_curriculum, name='download_curriculum'),
 
     # Campus
     path('campus/new/', views.CampusCreateView.as_view(), name='campus_create'),
     path('campus/<int:pk>/edit/', views.CampusUpdateView.as_view(), name='campus_update'),
     path('campus/<int:pk>/delete/', views.CampusDeleteView.as_view(), name='campus_delete'),
-]
+]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

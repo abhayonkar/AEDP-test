@@ -293,3 +293,17 @@ def download_report_view(request, user_id):
     response = HttpResponse(pdf, content_type='application/pdf')
     response['Content-Disposition'] = f'attachment; filename="AEDP_Report_{target_user.username}.pdf"'
     return response
+
+
+from django.http import FileResponse
+from django.contrib.admin.views.decorators import staff_member_required
+from django.shortcuts import get_object_or_404
+
+@staff_member_required
+def download_curriculum(request, program_id):
+    program = get_object_or_404(Program, id=program_id)
+    if program.curriculum_file:
+        response = FileResponse(program.curriculum_file.open(), content_type='application/pdf')
+        response['Content-Disposition'] = f'attachment; filename="{program.curriculum_file.name}"'
+        return response
+    return HttpResponse("No curriculum file available", status=404)

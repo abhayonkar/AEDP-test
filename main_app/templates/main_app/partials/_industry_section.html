@@ -30,11 +30,13 @@
                     <th>Industry Name</th>
                     <th>Sector</th>
                     <th>MoU Signed</th>
+                    <th>Curriculum Consulted</th>  
                     <th>Start Date</th>
                     <th>Validity Date</th>
                     <th>Student Commitment (No. of students)</th>
                     <th>Stipend Range</th>
                     <th>Engagement Type</th>
+                    <th>Other Locations</th>  
                     <th>Actions</th>
                 </tr>
             </thead>
@@ -44,6 +46,8 @@
                     <td>{{ entry.industry_name }}</td>
                     <td>{{ entry.sector_name }}</td>
                     <td>{{ entry.mou_signed }}</td>
+                    <td>{{ entry.curriculum_consulted_to_industry }}</td>
+                    <td>{{ entry.other_locations|default:"N/A" }}</td>
                     <td>{{ entry.start_date|default:"N/A" }}</td>
                     <td>{{ entry.validity_date|default:"N/A" }}</td>
                     <td>{{ entry.student_commitment }}</td>

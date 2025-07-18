@@ -95,6 +95,8 @@ class Industry(models.Model):
     industry_name = models.CharField(max_length=255)
     sector_name = models.CharField(max_length=255)
     mou_signed = models.CharField("MoU Signed Status (Yes/No)", max_length=3, choices=[('Yes', 'Yes'), ('No', 'No')])
+    curriculum_consulted_to_industry = models.CharField("Curriculum Consulted to Industry (Yes/No)", max_length=3, choices=[('Yes', 'Yes'), ('No', 'No')],default='No')
+    other_locations = models.TextField("Other Locations", blank=True, null=True)
     start_date = models.DateField(blank=True, null=True)
     validity_date = models.DateField(blank=True, null=True)
     student_commitment = models.PositiveIntegerField("Student commitment for apprenticeship (no. of students)", default=0)
@@ -104,6 +106,7 @@ class Industry(models.Model):
     location_head = models.CharField(max_length=255)
     aedp_programme = models.CharField("Title of AEDP Programme", max_length=255)
     other_details = models.TextField(blank=True, null=True)
+
 
     def __str__(self):
         return f"{self.industry_name} for {self.user.username}"
@@ -137,8 +140,26 @@ class BOAT(models.Model):
     def __str__(self):
         return f"{self.campus_college_name} BOAT entry for {self.user.username}"
 
+
+
+
+
 class Program(models.Model):
-    """Stores an AEDP program implementation progress entry. A user can have multiple."""
+    DEGREE_CHOICES = [
+        ('B.Com', 'B.Com'),
+        ('B.A.', 'B.A.'),
+        ('B.Sc.', 'B.Sc.'),
+        ('B.M.S.', 'B.M.S.'),
+        ('B.Tech', 'B.Tech'),
+        ('B.B.A.', 'B.B.A.'),
+        ('M.Com.', 'M.Com.'),
+        ('M.A.', 'M.A.'),
+        ('M.Sc.', 'M.Sc.'),
+        ('M.B.A', 'M.B.A'),
+        ('M.Tech', 'M.Tech'),
+        ('Others', 'Others')
+    ]
+
     STATUS_CHOICES = [
         ('Completed', 'Completed'),
         ('In Progress', 'In Progress'),
@@ -146,9 +167,11 @@ class Program(models.Model):
     ]
 
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='program_entries')
-    program_name = models.CharField("Program Name", max_length=255)
+    program_name = models.CharField("Program Name", max_length=20, choices=DEGREE_CHOICES)
+    other_degree = models.CharField("Other Degree (if selected Others)", max_length=100, blank=True, null=True)
+    specialization = models.CharField("Specialization/Branch", max_length=200, blank=True)
+    curriculum_file = models.FileField("Upload Curriculum", upload_to='curricula/', blank=True, null=True)
     
-    # Status for each of the four steps, as requested
     syllabus_preparation = models.CharField("Syllabus Preparation", max_length=20, choices=STATUS_CHOICES, default='Not Started')
     credit_allocation = models.CharField("Credit Allocation", max_length=20, choices=STATUS_CHOICES, default='Not Started')
     board_of_deans_approval = models.CharField("Board of Deans Approval", max_length=20, choices=STATUS_CHOICES, default='Not Started')

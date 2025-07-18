@@ -109,6 +109,11 @@ else:
     
 # }
 
+# Add these settings if not already present
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+
 
 LOGIN_URL = 'login'
 
