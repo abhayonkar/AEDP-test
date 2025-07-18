@@ -5,94 +5,65 @@
     <form method="post" action="{% url 'industry_create' %}">
         {% csrf_token %}
         <div class="row">
-            <!-- Industry and Sector Name -->
+            {% for field in industry_form %}
             <div class="col-md-6 mb-3">
-                <label class="form-label">Industry Name</label>
-                {{ industry_form.industry_name }}
+                <label class="form-label">
+                    {{ field.label }}
+                    {% if field.name == 'type_of_engagement' %}
+                        <!-- (Curriculum, Apprenticeship, Assessment, Stipend) -->
+                    {% endif %}
+                </label>
+                {{ field }}
             </div>
-            <div class="col-md-6 mb-3">
-                <label class="form-label">Sector Name</label>
-                {{ industry_form.sector_name }}
-            </div>
-
-            <!-- Moved Type of Engagement and AEDP Programme above date fields -->
-            <div class="col-md-6 mb-3">
-                <label class="form-label">Type of Engagement (Curriculum, Apprenticeship, Assessment, Training etc.)</label>
-                {{ industry_form.type_of_engagement }}
-            </div>
-            <div class="col-md-6 mb-3">
-                <label class="form-label">Title of AEDP Programme</label>
-                {{ industry_form.aedp_programme }}
-            </div>
-
-            <!-- Date Fields -->
-            <div class="col-md-6 mb-3">
-                <label class="form-label">Start Date</label>
-                {{ industry_form.start_date }}
-            </div>
-            <div class="col-md-6 mb-3">
-                <label class="form-label">Validity Date</label>
-                {{ industry_form.validity_date }}
-            </div>
-
-            <!-- MoU and Curriculum Status -->
-            <div class="col-md-6 mb-3">
-                <label class="form-label">MoU Signed Status</label>
-                {{ industry_form.mou_signed }}
-            </div>
-            <div class="col-md-6 mb-3">
-                <label class="form-label">Curriculum Consulted</label>
-                {{ industry_form.curriculum_consulted }}
-            </div>
-
-            <!-- Split Location Fields -->
-            <div class="col-md-6 mb-3">
-                <label class="form-label">Head Office Location</label>
-                {{ industry_form.location_head }}
-            </div>
-            <div class="col-md-6 mb-3">
-                <label class="form-label">Other Location</label>
-                {{ industry_form.location_other }}
-            </div>
-
-            <!-- Other Fields -->
-            <div class="col-md-6 mb-3">
-                <label class="form-label">Student Commitment</label>
-                {{ industry_form.student_commitment }}
-            </div>
-            <div class="col-md-6 mb-3">
-                <label class="form-label">Stipend Range</label>
-                {{ industry_form.stipend_range }}
-            </div>
-            <div class="col-12 mb-3">
-                <label class="form-label">Contact Person Details</label>
-                {{ industry_form.contact_person }}
-            </div>
-            <div class="col-12 mb-3">
-                <label class="form-label">Other Details</label>
-                {{ industry_form.other_details }}
-            </div>
+            {% endfor %}
         </div>
         <button type="submit" class="btn btn-primary">Add Industry Entry</button>
     </form>
 
-    <!-- Rest of the table structure remains the same -->
-    <!-- Add curriculum_consulted to the table headers -->
-    <table class="table table-bordered table-striped mt-2">
-        <thead>
-            <tr>
-                <th>Industry Name</th>
-                <th>Sector</th>
-                <th>MoU Signed</th>
-                <th>Curriculum Consulted</th>
-                <th>Start Date</th>
-                <th>Validity Date</th>
-                <th>Student Commitment</th>
-                <th>Stipend Range</th>
-                <th>Engagement Type</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <!-- ... rest of the table content ... -->
-    </table>
+    <hr class="my-4">
+
+    <h3 class="h5">Existing Entries</h3>
+    <div class="table-responsive">
+        <table class="table table-bordered table-striped mt-2">
+            <thead>
+                <tr>
+                    <th>Industry Name</th>
+                    <th>Sector</th>
+                    <th>MoU Signed</th>
+                    <th>Start Date</th>
+                    <th>Validity Date</th>
+                    <th>Student Commitment (No. of students)</th>
+                    <th>Stipend Range</th>
+                    <th>Engagement Type</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for entry in industry_entries %}
+                <tr>
+                    <td>{{ entry.industry_name }}</td>
+                    <td>{{ entry.sector_name }}</td>
+                    <td>{{ entry.mou_signed }}</td>
+                    <td>{{ entry.start_date|default:"N/A" }}</td>
+                    <td>{{ entry.validity_date|default:"N/A" }}</td>
+                    <td>{{ entry.student_commitment }}</td>
+                    <td>{{ entry.stipend_range|default:"N/A" }}</td>
+                    <td>{{ entry.type_of_engagement }}</td>
+                    <td>
+                        <a href="{% url 'industry_update' entry.pk %}" class="btn btn-sm btn-warning"><i class="fas fa-edit"></i></a>
+                        <a href="{% url 'industry_delete' entry.pk %}" class="btn btn-sm btn-danger"><i class="fas fa-trash"></i></a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="9" class="text-center">No industry data added yet.</td></tr>
+                {% endfor %}
+            </tbody>
+            <tfoot>
+                <tr>
+                    <td colspan="5" class="text-end"><strong>Total Student Commitment:</strong></td>
+                    <td colspan="4"><strong>{{ total_student_commitment }}</strong></td>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
 </div>

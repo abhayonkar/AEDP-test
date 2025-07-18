@@ -1,104 +1,58 @@
 <div class="form-section" id="program">
-    <h2 class="section-title"><i class="fas fa-graduation-cap me-2"></i>Program Details</h2>
-
-    <form method="post" action="{% url 'program_create' %}" enctype="multipart/form-data">
+    <h2 class="section-title"><i class="fas fa-project-diagram me-2"></i>Implementation Progress of Selected AEDP Program         
+        <small style="color:red; font-size:smaller;">(Fill the data separately for each Program)</small></h2>
+    <form method="post" action="{% url 'program_create' %}">
         {% csrf_token %}
         <div class="row">
-            <!-- Split Program Name into Program and Specialization -->
+            {% for field in program_form %}
             <div class="col-md-6 mb-3">
-                <label class="form-label">Program</label>
-                {{ program_form.program }}
+                <label class="form-label">{{ field.label }}</label>
+                {{ field }}
             </div>
-            <div class="col-md-6 mb-3">
-                <label class="form-label">Specialization/Branch</label>
-                {{ program_form.specialization }}
-            </div>
-
-            <!-- Status Fields -->
-            <div class="col-md-6 mb-3">
-                <label class="form-label">Syllabus Preparation Status</label>
-                {{ program_form.syllabus_preparation }}
-            </div>
-            <div class="col-md-6 mb-3">
-                <label class="form-label">Credit Allocation Status</label>
-                {{ program_form.credit_allocation }}
-            </div>
-            <div class="col-md-6 mb-3">
-                <label class="form-label">Board of Deans Approval Status</label>
-                {{ program_form.board_of_deans_approval }}
-            </div>
-            <div class="col-md-6 mb-3">
-                <label class="form-label">Academic Council Approval Status</label>
-                {{ program_form.academic_council_approval }}
-            </div>
-
-            <!-- Timeline and Document Upload -->
-            <div class="col-md-6 mb-3">
-                <label class="form-label">Timeline</label>
-                {{ program_form.timeline }}
-            </div>
-            <div class="col-md-6 mb-3">
-                <label class="form-label">Upload Document</label>
-                {{ program_form.document }}
-            </div>
-
-            <!-- Remarks -->
-            <div class="col-12 mb-3">
-                <label class="form-label">Remarks</label>
-                {{ program_form.remarks }}
-            </div>
+            {% endfor %}
         </div>
         <button type="submit" class="btn btn-primary">Add Program Entry</button>
     </form>
-
-    <!-- Update the table headers to reflect new fields -->
-    <table class="table table-bordered table-striped mt-2">
-        <thead>
-            <tr>
-                <th>Program</th>
-                <th>Specialization</th>
-                <th>Syllabus Preparation</th>
-                <th>Credit Allocation</th>
-                <th>Board of Deans Approval</th>
-                <th>Academic Council Approval</th>
-                <th>Timeline</th>
-                <th>Document</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for entry in program_entries %}
-            <tr>
-                <td>{{ entry.program }}</td>
-                <td>{{ entry.specialization }}</td>
-                <td>{{ entry.syllabus_preparation }}</td>
-                <td>{{ entry.credit_allocation }}</td>
-                <td>{{ entry.board_of_deans_approval }}</td>
-                <td>{{ entry.academic_council_approval }}</td>
-                <td>{{ entry.timeline|default:"N/A" }}</td>
-                <td>
-                    {% if entry.document %}
-                    <a href="{{ entry.document.url }}" target="_blank" class="btn btn-sm btn-info">
-                        <i class="fas fa-download"></i> Download
-                    </a>
-                    {% else %}
-                    N/A
-                    {% endif %}
-                </td>
-                <td>
-                    <a href="{% url 'program_update' entry.pk %}" class="btn btn-sm btn-warning">
-                        <i class="fas fa-edit"></i>
-                    </a>
-                    <a href="{% url 'program_delete' entry.pk %}" class="btn btn-sm btn-danger">
-                        <i class="fas fa-trash"></i>
-                    </a>
-                </td>
-            </tr>
-            {% empty %}
-            <tr>
-                <td colspan="9" class="text-center">No program data added yet.</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+    <hr class="my-4">
+    <h3 class="h5">Existing Entries</h3>
+    <div class="table-responsive">
+        <table class="table table-bordered table-striped mt-2">
+            <thead class="table-light">
+                <tr>
+                    <th rowspan="2" class="align-middle text-center">Program Name</th>
+                    <th colspan="4" class="text-center">Component Status</th>
+                    <th rowspan="2" class="align-middle text-center">Timeline</th>
+                    <th rowspan="2" class="align-middle text-center">Remarks</th>
+                    <th rowspan="2" class="align-middle text-center">Actions</th>
+                </tr>
+                <tr>
+                    <th class="text-center">1. Syllabus Preparation</th>
+                    <th class="text-center">2. Credit Allocation</th>
+                    <th class="text-center">3. Board of Deans Approval</th>
+                    <th class="text-center">4. Academic Council Approval</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for entry in program_entries %}
+                <tr>
+                    <td>{{ entry.program_name }}</td>
+                    <td>{{ entry.get_syllabus_preparation_display }}</td>
+                    <td>{{ entry.get_credit_allocation_display }}</td>
+                    <td>{{ entry.get_board_of_deans_approval_display }}</td>
+                    <td>{{ entry.get_academic_council_approval_display }}</td>
+                    <td>{{ entry.timeline }}</td>
+                    <td>{{ entry.remarks }}</td>
+                    <td>
+                        <a href="{% url 'program_update' entry.pk %}" class="btn btn-sm btn-warning"><i class="fas fa-edit"></i></a>
+                        <a href="{% url 'program_delete' entry.pk %}" class="btn btn-sm btn-danger"><i class="fas fa-trash"></i></a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="8" class="text-center">No Program data added yet.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 </div>
