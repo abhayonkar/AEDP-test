@@ -1,29 +1,29 @@
+# abhayonkar/aedp-test/AEDP-test-0557ce3e060e3a4334b3e58f088fa172e03244e4/main_app/views.py
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.models import User
-from django.http import HttpResponse, HttpResponseForbidden
-from django.template.loader import render_to_string
-from django.views.generic import View, CreateView, UpdateView, DeleteView
-from django.contrib.auth.mixins import LoginRequiredMixin
-from django.urls import reverse_lazy
 from django.contrib import messages
-from .forms import *
-from .models import *
-from django.db.models import Sum, Avg
-import json
+from django.http import HttpResponse
+from django.template.loader import get_template
+from xhtml2pdf import pisa
+import io
+import os
+from django.conf import settings
+from django.urls import reverse # Import reverse
+from .forms import (
+    LoginForm, BasicInfoForm, IndustryForm, SSCForm, BOATForm,
+    ProgramForm, CampusForm, OutreachForm, ChallengesForm, TimelinesForm
+)
+from .models import (
+    BasicInfo, Industry, SSC, BOAT, Program, Campus, Outreach, Challenges, Timelines
+)
 
-# You need to install WeasyPrint: pip install WeasyPrint
-from weasyprint import HTML
 
-# -----------------------------------------------------------------------------
-# AUTHENTICATION, DASHBOARD, ANALYSIS VIEWS
-# -----------------------------------------------------------------------------
-
-def login_view(request):
-    """Handles user login."""
+# Authentication Views
+def user_login(request):
     if request.user.is_authenticated:
-        return redirect('dashboard')
+        return redirect('user_dashboard')
+
     if request.method == 'POST':
         form = LoginForm(request.POST)
         if form.is_valid():
@@ -32,278 +32,378 @@ def login_view(request):
             user = authenticate(request, username=username, password=password)
             if user is not None:
                 login(request, user)
-                return redirect('dashboard')
+                return redirect('user_dashboard')
             else:
                 messages.error(request, 'Invalid username or password.')
     else:
         form = LoginForm()
     return render(request, 'main_app/login.html', {'form': form})
 
-def logout_view(request):
-    """Handles user logout."""
+def user_logout(request):
     logout(request)
+    messages.success(request, 'You have been logged out.')
     return redirect('login')
 
+# Dashboard Views
 @login_required
-def dashboard_view(request):
-    """
-    Directs users to the appropriate dashboard (admin or user)
-    and populates it with necessary data and forms.
-    """
-    if request.user.is_superuser:
-        # Admin dashboard
-        all_users = User.objects.filter(is_superuser=False)
-        context = {'all_users': all_users}
-        return render(request, 'main_app/admin_dashboard.html', context)
-    else:
-        # Regular user dashboard
-        basic_info, _ = BasicInfo.objects.get_or_create(user=request.user)
-        outreach, _ = Outreach.objects.get_or_create(user=request.user)
-        challenges, _ = Challenges.objects.get_or_create(user=request.user)
-        timelines, _ = Timelines.objects.get_or_create(user=request.user)
-        total_student_commitment = Industry.objects.filter(user=request.user).aggregate(Sum('student_commitment'))['student_commitment__sum'] or 0
-        total_boat_students = BOAT.objects.filter(user=request.user).aggregate(Sum('no_of_students'))['no_of_students__sum'] or 0
-        total_enrolled_students = Campus.objects.filter(user=request.user).aggregate(Sum('student_enrolled'))['student_enrolled__sum'] or 0
-        
-        context = {
-            # Forms for single-entry models
-            'basic_info_form': BasicInfoForm(instance=basic_info),
-            'outreach_form': OutreachForm(instance=outreach),
-            'challenges_form': ChallengesForm(instance=challenges),
-            'timelines_form': TimelinesForm(instance=timelines),
-
-            # The actual single-entry objects for display
-            'basic_info': basic_info,
-            'outreach': outreach,
-            'challenges': challenges,
-            'timelines': timelines,
-
-            # Forms for adding new multi-entry items
-            'industry_form': IndustryForm(),
-            'ssc_form': SSCForm(),
-            'boat_form': BOATForm(),
-            'program_form': ProgramForm(),
-            'campus_form': CampusForm(),
-
-            # Existing data for multi-entry models
-            'industry_entries': Industry.objects.filter(user=request.user),
-            'ssc_entries': SSC.objects.filter(user=request.user),
-            'boat_entries': BOAT.objects.filter(user=request.user),
-            'program_entries': Program.objects.filter(user=request.user),
-            'campus_entries': Campus.objects.filter(user=request.user),
-            
-            # Totals
-            'total_student_commitment': total_student_commitment,
-            'total_boat_students': total_boat_students,
-            'total_enrolled_students': total_enrolled_students,
-        }
-        return render(request, 'main_app/user_dashboard.html', context)
-
-@login_required
-def analysis_view(request, user_id):
-    if not request.user.is_superuser:
-        return HttpResponseForbidden("You do not have permission to access this page.")
-    target_user = get_object_or_404(User, pk=user_id)
-    campus_data = Campus.objects.filter(user=target_user)
-    boat_data = BOAT.objects.filter(user=target_user)
-    enrollment_labels = [entry.aedp_programme for entry in campus_data]
-    enrollment_data = [entry.student_enrolled for entry in campus_data]
-    stipend_labels = [entry.aedp_programme for entry in boat_data]
-    stipend_values = []
-    for entry in boat_data:
-        try:
-            parts = [int(p.strip()) for p in entry.stipend.split('-')]
-            stipend_values.append(sum(parts) / len(parts))
-        except (ValueError, AttributeError):
-            stipend_values.append(0)
+def user_dashboard(request):
+    user = request.user
     context = {
-        'target_user': target_user,
-        'enrollment_labels': json.dumps(enrollment_labels),
-        'enrollment_data': json.dumps(enrollment_data),
-        'stipend_labels': json.dumps(stipend_labels),
-        'stipend_data': json.dumps(stipend_values),
+        'basic_info_form': BasicInfoForm(instance=BasicInfo.objects.filter(user=user).first()),
+        'industry_form': IndustryForm(instance=Industry.objects.filter(user=user).first()),
+        'ssc_form': SSCForm(instance=SSC.objects.filter(user=user).first()),
+        'boat_form': BOATForm(instance=BOAT.objects.filter(user=user).first()),
+        'program_form': ProgramForm(instance=Program.objects.filter(user=user).first()),
+        'campus_form': CampusForm(instance=Campus.objects.filter(user=user).first()),
+        'outreach_form': OutreachForm(instance=Outreach.objects.filter(user=user).first()),
+        'challenges_form': ChallengesForm(instance=Challenges.objects.filter(user=user).first()),
+        'timelines_form': TimelinesForm(instance=Timelines.objects.filter(user=user).first()),
     }
-    return render(request, 'main_app/analysis.html', context)
+    return render(request, 'main_app/user_dashboard.html', context)
 
-# -----------------------------------------------------------------------------
-# SINGLE-ENTRY FORM HANDLING VIEWS (REFACTORED)
-# -----------------------------------------------------------------------------
-class SingleEntryUpdateView(LoginRequiredMixin, UpdateView):
-    success_url = reverse_lazy('dashboard')
-    def get_object(self, queryset=None):
-        obj, created = self.model.objects.get_or_create(user=self.request.user)
-        return obj
-    def form_valid(self, form):
-        messages.success(self.request, f'{self.model._meta.verbose_name.title()} updated successfully.')
-        return super().form_valid(form)
-    def form_invalid(self, form):
-        for field, errors in form.errors.items():
-            for error in errors:
-                messages.error(self.request, f"{field.title()}: {error}")
-        return redirect('dashboard')
-
-class BasicInfoUpdateView(SingleEntryUpdateView):
-    model = BasicInfo
-    form_class = BasicInfoForm
-
-class OutreachUpdateView(SingleEntryUpdateView):
-    model = Outreach
-    form_class = OutreachForm
-
-class ChallengesUpdateView(SingleEntryUpdateView):
-    model = Challenges
-    form_class = ChallengesForm
-
-class TimelinesUpdateView(SingleEntryUpdateView):
-    model = Timelines
-    form_class = TimelinesForm
-
-# -----------------------------------------------------------------------------
-# GENERIC BASE VIEWS FOR MULTI-ENTRY MODELS
-# -----------------------------------------------------------------------------
-class GenericCreateView(LoginRequiredMixin, CreateView):
-    template_name = 'main_app/generic_form.html'
-    success_url = reverse_lazy('dashboard')
-    def form_valid(self, form):
-        form.instance.user = self.request.user
-        messages.success(self.request, f'{self.model._meta.verbose_name.title()} entry added successfully.')
-        return super().form_valid(form)
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['model_name'] = self.model._meta.verbose_name.title()
-        return context
-
-class GenericUpdateView(LoginRequiredMixin, UpdateView):
-    template_name = 'main_app/generic_form.html'
-    success_url = reverse_lazy('dashboard')
-    def get_queryset(self):
-        return self.model.objects.filter(user=self.request.user)
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['model_name'] = self.model._meta.verbose_name.title()
-        return context
-    def form_valid(self, form):
-        messages.success(self.request, f'{self.model._meta.verbose_name.title()} entry updated successfully.')
-        return super().form_valid(form)
-
-class GenericDeleteView(LoginRequiredMixin, DeleteView):
-    template_name = 'main_app/generic_confirm_delete.html'
-    success_url = reverse_lazy('dashboard')
-    def get_queryset(self):
-        return self.model.objects.filter(user=self.request.user)
-    def form_valid(self, form):
-        messages.success(self.request, f'{self.model._meta.verbose_name.title()} entry deleted successfully.')
-        return super().form_valid(form)
-
-# -----------------------------------------------------------------------------
-# CONCRETE VIEWS FOR MULTI-ENTRY MODELS (FIX FOR CIRCULAR IMPORT)
-# -----------------------------------------------------------------------------
-
-# --- Industry Views ---
-class IndustryCreateView(GenericCreateView):
-    model = Industry
-    form_class = IndustryForm
-class IndustryUpdateView(GenericUpdateView):
-    model = Industry
-    form_class = IndustryForm
-class IndustryDeleteView(GenericDeleteView):
-    model = Industry
-
-# --- SSC Views ---
-class SSCCreateView(GenericCreateView):
-    model = SSC
-    form_class = SSCForm
-class SSCUpdateView(GenericUpdateView):
-    model = SSC
-    form_class = SSCForm
-class SSCDeleteView(GenericDeleteView):
-    model = SSC
-
-# --- BOAT Views ---
-class BOATCreateView(GenericCreateView):
-    model = BOAT
-    form_class = BOATForm
-class BOATUpdateView(GenericUpdateView):
-    model = BOAT
-    form_class = BOATForm
-class BOATDeleteView(GenericDeleteView):
-    model = BOAT
-
-# --- Program Views ---
-class ProgramCreateView(GenericCreateView):
-    model = Program
-    form_class = ProgramForm
-class ProgramUpdateView(GenericUpdateView):
-    model = Program
-    form_class = ProgramForm
-class ProgramDeleteView(GenericDeleteView):
-    model = Program
-
-# --- Campus Views ---
-class CampusCreateView(GenericCreateView):
-    model = Campus
-    form_class = CampusForm
-class CampusUpdateView(GenericUpdateView):
-    model = Campus
-    form_class = CampusForm
-class CampusDeleteView(GenericDeleteView):
-    model = Campus
-
-# -----------------------------------------------------------------------------
-# PDF REPORT GENERATION
-# -----------------------------------------------------------------------------
 @login_required
-def download_report_view(request, user_id):
-    if not request.user.is_superuser and request.user.id != user_id:
-        return HttpResponseForbidden("You do not have permission to access this report.")
-    target_user = get_object_or_404(User, pk=user_id)
-    industry_data = Industry.objects.filter(user=target_user)
-    boat_data = BOAT.objects.filter(user=target_user)
-    campus_data = Campus.objects.filter(user=target_user)
-    total_student_commitment = industry_data.aggregate(Sum('student_commitment'))['student_commitment__sum'] or 0
-    total_boat_students = boat_data.aggregate(Sum('no_of_students'))['no_of_students__sum'] or 0
-    total_enrolled_students = campus_data.aggregate(Sum('student_enrolled'))['student_enrolled__sum'] or 0
+def admin_dashboard(request):
+    if not request.user.is_staff:
+        messages.error(request, 'You do not have permission to access this page.')
+        return redirect('user_dashboard')
     
-    labels = [entry.aedp_programme for entry in campus_data]
-    data = [entry.student_enrolled for entry in campus_data]
+    users_with_data = User.objects.filter(is_staff=False).annotate(
+        has_basic_info=models.Exists(BasicInfo.objects.filter(user=models.OuterRef('pk'))),
+        has_industry=models.Exists(Industry.objects.filter(user=models.OuterRef('pk'))),
+        has_ssc=models.Exists(SSC.objects.filter(user=models.OuterRef('pk'))),
+        has_boat=models.Exists(BOAT.objects.filter(user=models.OuterRef('pk'))),
+        has_program=models.Exists(Program.objects.filter(user=models.OuterRef('pk'))),
+        has_campus=models.Exists(Campus.objects.filter(user=models.OuterRef('pk'))),
+        has_outreach=models.Exists(Outreach.objects.filter(user=models.OuterRef('pk'))),
+        has_challenges=models.Exists(Challenges.objects.filter(user=models.OuterRef('pk'))),
+        has_timelines=models.Exists(Timelines.objects.filter(user=models.OuterRef('pk'))),
+    ).order_by('username')
+    
     context = {
-        'user_data': target_user,
-        'basic_info': getattr(target_user, 'basic_info', None),
-        'industry_data': industry_data,
-        'ssc_data': SSC.objects.filter(user=target_user),
-        'boat_data': boat_data,
-        'program_data': Program.objects.filter(user=target_user),
-        'campus_data': campus_data,
-        'outreach_data': getattr(target_user, 'outreach', None),
-        'challenges': getattr(target_user, 'challenges', None),
-        'timelines': getattr(target_user, 'timelines', None),
-        'total_student_commitment': total_student_commitment,
-        'total_boat_students': total_boat_students,
-        'total_enrolled_students': total_enrolled_students,
-        'chart_labels': json.dumps(labels),
-        'chart_data': json.dumps(data)
+        'users_with_data': users_with_data
     }
-    html_string = render_to_string('main_app/pdf_report.html', context)
-    base_url = request.build_absolute_uri('/')
+    return render(request, 'main_app/admin_dashboard.html', context)
 
-    # Create the WeasyPrint HTML object, providing the base_url
-    # This tells WeasyPrint where to find files like "/static/1.png"
-    html = HTML(string=html_string, base_url=base_url)
-    pdf = html.write_pdf()
-    response = HttpResponse(pdf, content_type='application/pdf')
-    response['Content-Disposition'] = f'attachment; filename="AEDP_Report_{target_user.username}.pdf"'
+
+# Form Handling Views
+@login_required
+def basic_info_form_view(request):
+    instance = BasicInfo.objects.filter(user=request.user).first()
+    if request.method == 'POST':
+        form = BasicInfoForm(request.POST, instance=instance)
+        if form.is_valid():
+            basic_info = form.save(commit=False)
+            basic_info.user = request.user
+            basic_info.save()
+            messages.success(request, 'Basic Information saved successfully!')
+            return redirect(reverse('user_dashboard') + '#collapseBasicInfo') # Updated redirect
+        else:
+            messages.error(request, 'Please correct the errors below.')
+    else:
+        form = BasicInfoForm(instance=instance)
+    return render(request, 'main_app/user_dashboard.html', {'basic_info_form': form})
+
+@login_required
+def industry_form_view(request):
+    instance = Industry.objects.filter(user=request.user).first()
+    if request.method == 'POST':
+        form = IndustryForm(request.POST, instance=instance)
+        if form.is_valid():
+            industry = form.save(commit=False)
+            industry.user = request.user
+            industry.save()
+            messages.success(request, 'Industry Engagement details saved successfully!')
+            return redirect(reverse('user_dashboard') + '#collapseIndustry') # Updated redirect
+        else:
+            messages.error(request, 'Please correct the errors below.')
+    else:
+        form = IndustryForm(instance=instance)
+    return render(request, 'main_app/user_dashboard.html', {'industry_form': form})
+
+@login_required
+def ssc_form_view(request):
+    instance = SSC.objects.filter(user=request.user).first()
+    if request.method == 'POST':
+        form = SSCForm(request.POST, instance=instance)
+        if form.is_valid():
+            ssc = form.save(commit=False)
+            ssc.user = request.user
+            ssc.save()
+            messages.success(request, 'SSC details saved successfully!')
+            return redirect(reverse('user_dashboard') + '#collapseSSC') # Updated redirect
+        else:
+            messages.error(request, 'Please correct the errors below.')
+    else:
+        form = SSCForm(instance=instance)
+    return render(request, 'main_app/user_dashboard.html', {'ssc_form': form})
+
+@login_required
+def boat_form_view(request):
+    instance = BOAT.objects.filter(user=request.user).first()
+    if request.method == 'POST':
+        form = BOATForm(request.POST, instance=instance)
+        if form.is_valid():
+            boat = form.save(commit=False)
+            boat.user = request.user
+            boat.save()
+            messages.success(request, 'BOAT details saved successfully!')
+            return redirect(reverse('user_dashboard') + '#collapseBOAT') # Updated redirect
+        else:
+            messages.error(request, 'Please correct the errors below.')
+    else:
+        form = BOATForm(instance=instance)
+    return render(request, 'main_app/user_dashboard.html', {'boat_form': form})
+
+
+@login_required
+def program_form_view(request):
+    instance = Program.objects.filter(user=request.user).first()
+    if request.method == 'POST':
+        form = ProgramForm(request.POST, request.FILES, instance=instance)
+        if form.is_valid():
+            program = form.save(commit=False)
+            program.user = request.user
+            
+            # Calculate the number of curriculum ticks
+            count = 0
+            if program.major_minor_multidisciplinary_course:
+                count += 1
+            if program.skill_enhancement_course:
+                count += 1
+            if program.ability_enhancement_course:
+                count += 1
+            if program.value_added_course:
+                count += 1
+            if program.apprenticeship_course:
+                count += 1
+            program.num_curriculum_ticks = count
+            
+            program.save()
+            messages.success(request, 'Program details saved successfully!')
+            return redirect(reverse('user_dashboard') + '#collapseProgram') # Updated redirect
+        else:
+            messages.error(request, 'Please correct the errors below.')
+    else:
+        form = ProgramForm(instance=instance)
+    return render(request, 'main_app/user_dashboard.html', {'program_form': form})
+
+
+@login_required
+def campus_form_view(request):
+    instance = Campus.objects.filter(user=request.user).first()
+    if request.method == 'POST':
+        form = CampusForm(request.POST, instance=instance)
+        if form.is_valid():
+            campus = form.save(commit=False)
+            campus.user = request.user
+            campus.save()
+            messages.success(request, 'Campus details saved successfully!')
+            return redirect(reverse('user_dashboard') + '#collapseCampus') # Updated redirect
+        else:
+            messages.error(request, 'Please correct the errors below.')
+    else:
+        form = CampusForm(instance=instance)
+    return render(request, 'main_app/user_dashboard.html', {'campus_form': form})
+
+@login_required
+def outreach_form_view(request):
+    instance = Outreach.objects.filter(user=request.user).first()
+    if request.method == 'POST':
+        form = OutreachForm(request.POST, instance=instance)
+        if form.is_valid():
+            outreach = form.save(commit=False)
+            outreach.user = request.user
+            outreach.save()
+            messages.success(request, 'Outreach details saved successfully!')
+            return redirect(reverse('user_dashboard') + '#collapseOutreach') # Updated redirect
+        else:
+            messages.error(request, 'Please correct the errors below.')
+    else:
+        form = OutreachForm(instance=instance)
+    return render(request, 'main_app/user_dashboard.html', {'outreach_form': form})
+
+@login_required
+def challenges_form_view(request):
+    instance = Challenges.objects.filter(user=request.user).first()
+    if request.method == 'POST':
+        form = ChallengesForm(request.POST, instance=instance)
+        if form.is_valid():
+            challenges = form.save(commit=False)
+            challenges.user = request.user
+            challenges.save()
+            messages.success(request, 'Challenges details saved successfully!')
+            return redirect(reverse('user_dashboard') + '#collapseChallenges') # Updated redirect
+        else:
+            messages.error(request, 'Please correct the errors below.')
+    else:
+        form = ChallengesForm(instance=instance)
+    return render(request, 'main_app/user_dashboard.html', {'challenges_form': form})
+
+@login_required
+def timelines_form_view(request):
+    instance = Timelines.objects.filter(user=request.user).first()
+    if request.method == 'POST':
+        form = TimelinesForm(request.POST, instance=instance)
+        if form.is_valid():
+            timelines = form.save(commit=False)
+            timelines.user = request.user
+            timelines.save()
+            messages.success(request, 'Timelines details saved successfully!')
+            return redirect(reverse('user_dashboard') + '#collapseTimelines') # Updated redirect
+        else:
+            messages.error(request, 'Please correct the errors below.')
+    else:
+        form = TimelinesForm(instance=instance)
+    return render(request, 'main_app/user_dashboard.html', {'timelines_form': form})
+
+# Delete Views (using generic confirm delete template)
+@login_required
+def basic_info_delete(request):
+    obj = get_object_or_404(BasicInfo, user=request.user)
+    if request.method == 'POST':
+        obj.delete()
+        messages.success(request, 'Basic Information deleted successfully.')
+        return redirect('user_dashboard')
+    return render(request, 'main_app/generic_confirm_delete.html', {'object': obj, 'section_name': 'Basic Information'})
+
+@login_required
+def industry_delete(request):
+    obj = get_object_or_404(Industry, user=request.user)
+    if request.method == 'POST':
+        obj.delete()
+        messages.success(request, 'Industry Engagement details deleted successfully.')
+        return redirect('user_dashboard')
+    return render(request, 'main_app/generic_confirm_delete.html', {'object': obj, 'section_name': 'Industry Engagement'})
+
+@login_required
+def ssc_delete(request):
+    obj = get_object_or_404(SSC, user=request.user)
+    if request.method == 'POST':
+        obj.delete()
+        messages.success(request, 'SSC details deleted successfully.')
+        return redirect('user_dashboard')
+    return render(request, 'main_app/generic_confirm_delete.html', {'object': obj, 'section_name': 'SSC'})
+
+@login_required
+def boat_delete(request):
+    obj = get_object_or_404(BOAT, user=request.user)
+    if request.method == 'POST':
+        obj.delete()
+        messages.success(request, 'BOAT details deleted successfully.')
+        return redirect('user_dashboard')
+    return render(request, 'main_app/generic_confirm_delete.html', {'object': obj, 'section_name': 'BOAT'})
+
+@login_required
+def program_delete(request):
+    obj = get_object_or_404(Program, user=request.user)
+    if request.method == 'POST':
+        obj.delete()
+        messages.success(request, 'Program details deleted successfully.')
+        return redirect('user_dashboard')
+    return render(request, 'main_app/generic_confirm_delete.html', {'object': obj, 'section_name': 'Program'})
+
+@login_required
+def campus_delete(request):
+    obj = get_object_or_404(Campus, user=request.user)
+    if request.method == 'POST':
+        obj.delete()
+        messages.success(request, 'Campus details deleted successfully.')
+        return redirect('user_dashboard')
+    return render(request, 'main_app/generic_confirm_delete.html', {'object': obj, 'section_name': 'Campus'})
+
+@login_required
+def outreach_delete(request):
+    obj = get_object_or_404(Outreach, user=request.user)
+    if request.method == 'POST':
+        obj.delete()
+        messages.success(request, 'Outreach details deleted successfully.')
+        return redirect('user_dashboard')
+    return render(request, 'main_app/generic_confirm_delete.html', {'object': obj, 'section_name': 'Outreach'})
+
+@login_required
+def challenges_delete(request):
+    obj = get_object_or_404(Challenges, user=request.user)
+    if request.method == 'POST':
+        obj.delete()
+        messages.success(request, 'Challenges details saved successfully.')
+        return redirect('user_dashboard')
+    return render(request, 'main_app/generic_confirm_delete.html', {'object': obj, 'section_name': 'Challenges'})
+
+@login_required
+def timelines_delete(request):
+    obj = get_object_or_404(Timelines, user=request.user)
+    if request.method == 'POST':
+        obj.delete()
+        messages.success(request, 'Timelines details deleted successfully.')
+        return redirect('user_dashboard')
+    return render(request, 'main_app/generic_confirm_delete.html', {'object': obj, 'section_name': 'Timelines'})
+
+
+# PDF Report Generation
+@login_required
+def generate_pdf_report(request):
+    user = request.user
+    basic_info = BasicInfo.objects.filter(user=user).first()
+    industry = Industry.objects.filter(user=user).first()
+    ssc = SSC.objects.filter(user=user).first()
+    boat = BOAT.objects.filter(user=user).first()
+    program = Program.objects.filter(user=user).first()
+    campus = Campus.objects.filter(user=user).first()
+    outreach = Outreach.objects.filter(user=user).first()
+    challenges = Challenges.objects.filter(user=user).first()
+    timelines = Timelines.objects.filter(user=user).first()
+
+    context = {
+        'user': user,
+        'basic_info': basic_info,
+        'industry': industry,
+        'ssc': ssc,
+        'boat': boat,
+        'program': program,
+        'campus': campus,
+        'outreach': outreach,
+        'challenges': challenges,
+        'timelines': timelines,
+    }
+
+    template_path = 'main_app/pdf_report.html'
+    template = get_template(template_path)
+    html = template.render(context)
+
+    # Create a Django response object, and specify content_type as pdf
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = f'attachment; filename="{user.username}_report.pdf"'
+    
+    # create a pdf
+    pisa_status = pisa.CreatePDF(
+        html, dest=response)
+    # if error then show some funy view
+    if pisa_status.err:
+        return HttpResponse('We had some errors <pre>' + html + '</pre>')
     return response
 
+# Analysis View
+@login_required
+def analysis_view(request):
+    if not request.user.is_staff:
+        messages.error(request, 'You do not have permission to access this page.')
+        return redirect('user_dashboard')
 
-from django.http import FileResponse
-from django.contrib.admin.views.decorators import staff_member_required
-from django.shortcuts import get_object_or_404
+    total_users = User.objects.filter(is_staff=False).count()
+    
+    # Example analytics (you can expand this significantly)
+    total_basic_info = BasicInfo.objects.count()
+    total_industry_mous_signed = Industry.objects.filter(mou_signed='Yes').count()
+    total_program_students = Program.objects.aggregate(total_students=models.Sum('student_intake'))['total_students'] # Assuming program had student intake
+    
+    # Count of each program type
+    program_counts = Program.objects.values('program_name').annotate(count=models.Count('program_name')).order_by('program_name')
 
-@staff_member_required
-def download_curriculum(request, program_id):
-    program = get_object_or_404(Program, id=program_id)
-    if program.curriculum_file:
-        response = FileResponse(program.curriculum_file.open(), content_type='application/pdf')
-        response['Content-Disposition'] = f'attachment; filename="{program.curriculum_file.name}"'
-        return response
-    return HttpResponse("No curriculum file available", status=404)
+    context = {
+        'total_users': total_users,
+        'total_basic_info': total_basic_info,
+        'total_industry_mous_signed': total_industry_mous_signed,
+        'total_program_students': total_program_students if total_program_students else 0,
+        'program_counts': program_counts,
+    }
+    return render(request, 'main_app/analysis.html', context)

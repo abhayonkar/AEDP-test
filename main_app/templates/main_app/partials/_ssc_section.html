@@ -1,49 +1,48 @@
-<div class="form-section" id="ssc">
-    <h2 class="section-title"><i class="fas fa-users-gear me-2"></i>Sector Skill Council (SSC) Engagement & MoUs
-        <small style="color:red; font-size:smaller;">(Fill the data separately for each Sector Skill Council)</small></h2>
-    <form method="post" action="{% url 'ssc_create' %}">
-        {% csrf_token %}
-        <div class="row">
-            {% for field in ssc_form %}
-            <div class="col-md-6 mb-3">
-                <label class="form-label">{{ field.label }}</label>
-                {{ field }}
+<div class="card mb-3">
+    <div class="card-header">
+        Sector Skill Council (SSC) Details
+    </div>
+    <div class="card-body">
+        <form method="post" action="{% url 'ssc_form' %}" class="data-form" data-section-id="collapseSSC">
+            {% csrf_token %}
+            <div class="mb-3">
+                <label for="{{ ssc_form.ssc_name.id_for_label }}" class="form-label">SSC Name</label>
+                {{ ssc_form.ssc_name }}
             </div>
-            {% endfor %}
-        </div>
-        <button type="submit" class="btn btn-primary">Add SSC Entry</button>
-    </form>
-    <hr class="my-4">
-    <h3 class="h5">Existing Entries</h3>
-    <div class="table-responsive">
-        <table class="table table-bordered table-striped mt-2">
-            <thead>
-                <tr>
-                    <th>SSC Name</th>
-                    <th>Sector</th>
-                    <th>MoU Signed</th>
-                    <th>Start Date</th>
-                    <th>Validity Date</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for entry in ssc_entries %}
-                <tr>
-                    <td>{{ entry.ssc_name }}</td>
-                    <td>{{ entry.sector_name }}</td>
-                    <td>{{ entry.mou_signed }}</td>
-                    <td>{{ entry.start_date|default:"N/A" }}</td>
-                    <td>{{ entry.validity_date|default:"N/A" }}</td>
-                    <td>
-                        <a href="{% url 'ssc_update' entry.pk %}" class="btn btn-sm btn-warning"><i class="fas fa-edit"></i></a>
-                        <a href="{% url 'ssc_delete' entry.pk %}" class="btn btn-sm btn-danger"><i class="fas fa-trash"></i></a>
-                    </td>
-                </tr>
-                {% empty %}
-                <tr><td colspan="6" class="text-center">No SSC data added yet.</td></tr>
-                {% endfor %}
-            </tbody>
-        </table>
+            <div class="mb-3">
+                <label for="{{ ssc_form.sector_name.id_for_label }}" class="form-label">Sector Name</label>
+                {{ ssc_form.sector_name }}
+            </div>
+            <div class="mb-3">
+                <label for="{{ ssc_form.mou_signed.id_for_label }}" class="form-label">MoU Signed</label>
+                {{ ssc_form.mou_signed }}
+            </div>
+            <div class="mb-3">
+                <label for="{{ ssc_form.start_date.id_for_label }}" class="form-label">Start Date</label>
+                {{ ssc_form.start_date }}
+            </div>
+            <div class="mb-3">
+                <label for="{{ ssc_form.validity_date.id_for_label }}" class="form-label">Validity Date</label>
+                {{ ssc_form.validity_date }}
+            </div>
+            <div class="mb-3">
+                <label for="{{ ssc_form.aedp_programme.id_for_label }}" class="form-label">AEDP Programme</label>
+                {{ ssc_form.aedp_programme }}
+            </div>
+            <div class="mb-3">
+                <label for="{{ ssc_form.type_of_engagement.id_for_label }}" class="form-label">Type of Engagement</label>
+                {{ ssc_form.type_of_engagement }}
+            </div>
+            <div class="mb-3">
+                <label for="{{ ssc_form.contact_person.id_for_label }}" class="form-label">Contact Person</label>
+                {{ ssc_form.contact_person }}
+            </div>
+            <div class="mb-3">
+                <label for="{{ ssc_form.remarks.id_for_label }}" class="form-label">Remarks</label>
+                {{ ssc_form.remarks }}
+            </div>
+            <button type="submit" class="btn btn-primary">Save SSC Details</button>
+            <a href="{% url 'ssc_delete' %}" class="btn btn-danger">Delete</a>
+        </form>
     </div>
 </div>

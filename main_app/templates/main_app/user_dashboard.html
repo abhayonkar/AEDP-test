@@ -1,105 +1,220 @@
 {% extends 'main_app/base.html' %}
+{% load static %}
 
 {% block content %}
-<div class="container-fluid">
-    <div class="row">
-        <div class="col-12">
-            <!-- Welcome message when no section is selected -->
-            <div id="welcome-section" class="form-section text-center">
-                <h2 class="section-title">
-                    <i class="fas fa-chart-line me-2"></i>
-                    AEDP Implementation Dashboard
-                </h2>
-                <p class="lead text-muted">Select a section from the sidebar to view and update your information.</p>
-                <div class="row mt-4">
-                    <div class="col-md-4">
-                        <div class="card border-primary">
-                            <div class="card-body text-center">
-                                <i class="fas fa-info-circle fa-2x text-primary mb-2"></i>
-                                <h5 class="card-title">Basic Information</h5>
-                                <p class="card-text">Update your basic profile details</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="card border-success">
-                            <div class="card-body text-center">
-                                <i class="fas fa-project-diagram fa-2x text-success mb-2"></i>
-                                <h5 class="card-title">Program Progress</h5>
-                                <p class="card-text">Track your program implementation</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="card border-warning">
-                            <div class="card-body text-center">
-                                <i class="fas fa-calendar-alt fa-2x text-warning mb-2"></i>
-                                <h5 class="card-title">Timelines</h5>
-                                <p class="card-text">Manage important dates and milestones</p>
-                            </div>
-                        </div>
-                    </div>
+<div class="container mt-4">
+    <h1 class="mb-4">Welcome, {{ user.username }}!</h1>
+
+    {% if messages %}
+        <div class="messages mb-3">
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <div class="mb-3">
+        <a href="{% url 'generate_pdf_report' %}" class="btn btn-info">Generate PDF Report</a>
+    </div>
+
+    <div class="accordion" id="dataAccordion">
+        {# Basic Information Section #}
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="headingBasicInfo">
+                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseBasicInfo" aria-expanded="true" aria-controls="collapseBasicInfo">
+                    Basic Information
+                </button>
+            </h2>
+            <div id="collapseBasicInfo" class="accordion-collapse collapse show" aria-labelledby="headingBasicInfo" data-bs-parent="#dataAccordion">
+                <div class="accordion-body">
+                    {% include 'main_app/partials/_basic_info_section.html' with basic_info_form=basic_info_form %}
                 </div>
             </div>
-
-            <!-- Include all the form sections with appropriate IDs -->
-            {% include 'main_app/partials/_basic_info_section.html' %}
-            {% include 'main_app/partials/_industry_section.html' %}
-            {% include 'main_app/partials/_ssc_section.html' %}
-            {% include 'main_app/partials/_boat_section.html' %}
-            {% include 'main_app/partials/_program_section.html' %}
-            {% include 'main_app/partials/_outreach_section.html' %}
-            {% include 'main_app/partials/_campus_section.html' %}
-            {% include 'main_app/partials/_challenges_section.html' %}
-            {% include 'main_app/partials/_timelines_section.html' %}
         </div>
+
+        {# Industry Engagement Section #}
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="headingIndustry">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseIndustry" aria-expanded="false" aria-controls="collapseIndustry">
+                    Industry Engagement
+                </button>
+            </h2>
+            <div id="collapseIndustry" class="accordion-collapse collapse" aria-labelledby="headingIndustry" data-bs-parent="#dataAccordion">
+                <div class="accordion-body">
+                    {% include 'main_app/partials/_industry_section.html' with industry_form=industry_form %}
+                </div>
+            </div>
+        </div>
+
+        {# SSC Section #}
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="headingSSC">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSSC" aria-expanded="false" aria-controls="collapseSSC">
+                    Sector Skill Council (SSC)
+                </button>
+            </h2>
+            <div id="collapseSSC" class="accordion-collapse collapse" aria-labelledby="headingSSC" data-bs-parent="#dataAccordion">
+                <div class="accordion-body">
+                    {% include 'main_app/partials/_ssc_section.html' with ssc_form=ssc_form %}
+                </div>
+            </div>
+        </div>
+
+        {# BOAT Section #}
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="headingBOAT">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseBOAT" aria-expanded="false" aria-controls="collapseBOAT">
+                    Board of Apprenticeship Training (BOAT)
+                </button>
+            </h2>
+            <div id="collapseBOAT" class="accordion-collapse collapse" aria-labelledby="headingBOAT" data-bs-parent="#dataAccordion">
+                <div class="accordion-body">
+                    {% include 'main_app/partials/_boat_section.html' with boat_form=boat_form %}
+                </div>
+            </div>
+        </div>
+
+        {# Program Details Section #}
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="headingProgram">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseProgram" aria-expanded="false" aria-controls="collapseProgram">
+                    Program Details
+                </button>
+            </h2>
+            <div id="collapseProgram" class="accordion-collapse collapse" aria-labelledby="headingProgram" data-bs-parent="#dataAccordion">
+                <div class="accordion-body">
+                    {% include 'main_app/partials/_program_section.html' with program_form=program_form %}
+                </div>
+            </div>
+        </div>
+
+        {# Campus Details Section #}
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="headingCampus">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseCampus" aria-expanded="false" aria-controls="collapseCampus">
+                    Campus Details
+                </button>
+            </h2>
+            <div id="collapseCampus" class="accordion-collapse collapse" aria-labelledby="headingCampus" data-bs-parent="#dataAccordion">
+                <div class="accordion-body">
+                    {% include 'main_app/partials/_campus_section.html' with campus_form=campus_form %}
+                </div>
+            </div>
+        </div>
+
+        {# Outreach Activity Section #}
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="headingOutreach">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOutreach" aria-expanded="false" aria-controls="collapseOutreach">
+                    Outreach Activity
+                </button>
+            </h2>
+            <div id="collapseOutreach" class="accordion-collapse collapse" aria-labelledby="headingOutreach" data-bs-parent="#dataAccordion">
+                <div class="accordion-body">
+                    {% include 'main_app/partials/_outreach_section.html' with outreach_form=outreach_form %}
+                </div>
+            </div>
+        </div>
+
+        {# Challenges Section #}
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="headingChallenges">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseChallenges" aria-expanded="false" aria-controls="collapseChallenges">
+                    Challenges
+                </button>
+            </h2>
+            <div id="collapseChallenges" class="accordion-collapse collapse" aria-labelledby="headingChallenges" data-bs-parent="#dataAccordion">
+                <div class="accordion-body">
+                    {% include 'main_app/partials/_challenges_section.html' with challenges_form=challenges_form %}
+                </div>
+            </div>
+        </div>
+
+        {# Timelines Section #}
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="headingTimelines">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTimelines" aria-expanded="false" aria-controls="collapseTimelines">
+                    Timelines
+                </button>
+            </h2>
+            <div id="collapseTimelines" class="accordion-collapse collapse" aria-labelledby="headingTimelines" data-bs-parent="#dataAccordion">
+                <div class="accordion-body">
+                    {% include 'main_app/partials/_timelines_section.html' with timelines_form=timelines_form %}
+                </div>
+            </div>
+        </div>
+
     </div>
 </div>
+{% endblock content %}
 
+{% block extra_js %}
+{# Script to open the correct accordion section based on URL hash after saving #}
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    const sidebarLinks = document.querySelectorAll('.list-group-item-action[data-section]');
-    const sections = document.querySelectorAll('.form-section[id]');
-    const welcomeSection = document.getElementById('welcome-section');
-    
-    // Hide all sections initially except welcome
-    sections.forEach(section => {
-        if (section.id !== 'welcome-section') {
-            section.style.display = 'none';
+    document.addEventListener('DOMContentLoaded', function() {
+        const urlHash = window.location.hash;
+        if (urlHash) {
+            // Remove 'show' class from all currently open accordion items
+            document.querySelectorAll('.accordion-collapse.show').forEach(function(element) {
+                element.classList.remove('show');
+            });
+
+            // Add 'show' class to the target accordion item
+            const targetCollapse = document.querySelector(urlHash);
+            if (targetCollapse) {
+                targetCollapse.classList.add('show');
+                // Also update the button's aria-expanded attribute and 'collapsed' class
+                const targetButton = document.querySelector(`[data-bs-target="${urlHash}"]`);
+                if (targetButton) {
+                    targetButton.setAttribute('aria-expanded', 'true');
+                    targetButton.classList.remove('collapsed');
+                }
+            }
+        }
+        // Ensure Basic Info is open by default if no hash is present (initial load)
+        else {
+            const basicInfoCollapse = document.getElementById('collapseBasicInfo');
+            if (basicInfoCollapse) {
+                basicInfoCollapse.classList.add('show');
+                const basicInfoButton = document.querySelector('[data-bs-target="#collapseBasicInfo"]');
+                if (basicInfoButton) {
+                    basicInfoButton.setAttribute('aria-expanded', 'true');
+                    basicInfoButton.classList.remove('collapsed');
+                }
+            }
         }
     });
-    
-    // Add click event listeners to sidebar links
-    sidebarLinks.forEach(link => {
-        link.addEventListener('click', function(e) {
-            e.preventDefault();
-            
-            const targetSection = this.getAttribute('data-section');
-            
-            // Remove active class from all links
-            sidebarLinks.forEach(l => l.classList.remove('active'));
-            
-            // Add active class to clicked link
-            this.classList.add('active');
-            
-            // Hide welcome section
-            if (welcomeSection) {
-                welcomeSection.style.display = 'none';
-            }
-            
-            // Hide all sections
-            sections.forEach(section => {
-                section.style.display = 'none';
-            });
-            
-            // Show target section
-            const targetElement = document.getElementById(targetSection);
-            if (targetElement) {
-                targetElement.style.display = 'block';
-                targetElement.scrollIntoView({ behavior: 'smooth' });
-            }
-        });
-    });
-});
 </script>
-{% endblock %}
+{# This script was previously included, but if you want 'other_degree' to always be visible, #}
+{# you might need to ensure this script doesn't interfere or remove its inclusion if it's the cause. #}
+{# <script src="{% static 'main_app/js/degree_toggle.js' %}"></script> #}
+{# No other JavaScript is included by default, so we'll add one to dynamically update tick count #}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const checkboxes = document.querySelectorAll('#collapseProgram .form-check-input');
+        const tickCountSpan = document.getElementById('num-curriculum-ticks');
+
+        function updateTickCount() {
+            let count = 0;
+            checkboxes.forEach(function(checkbox) {
+                if (checkbox.checked) {
+                    count++;
+                }
+            });
+            if (tickCountSpan) {
+                tickCountSpan.textContent = count;
+            }
+        }
+
+        checkboxes.forEach(function(checkbox) {
+            checkbox.addEventListener('change', updateTickCount);
+        });
+
+        // Initial count when the page loads
+        updateTickCount();
+    });
+</script>
+{% endblock extra_js %}

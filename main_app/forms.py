@@ -1,3 +1,4 @@
+# abhayonkar/aedp-test/AEDP-test-0557ce3e060e3a4334b3e58f088fa172e03244e4/main_app/forms.py
 from django import forms
 from .models import (
     BasicInfo, Industry, SSC, BOAT, Program, Campus, Outreach, Challenges, Timelines
@@ -137,6 +138,17 @@ class ProgramForm(forms.ModelForm):
     class Meta:
         model = Program
         exclude = ['user']
+        fields = [
+            'program_name', 'other_degree', 'specialization',
+            'curriculum_file', 'syllabus_preparation', 'credit_allocation',
+            'board_of_deans_approval', 'academic_council_approval', 'timeline', 'remarks',
+            # New fields for Curriculum Structure
+            'major_minor_multidisciplinary_course',
+            'skill_enhancement_course',
+            'ability_enhancement_course',
+            'value_added_course',
+            'apprenticeship_course',
+        ]
         widgets = {
             'program_name': forms.Select(attrs={'class': 'form-select'}),
             'other_degree': forms.TextInput(attrs={
@@ -154,12 +166,22 @@ class ProgramForm(forms.ModelForm):
             'academic_council_approval': forms.Select(attrs={'class': 'form-select'}),
             'timeline': forms.TextInput(attrs={'class': 'form-control'}),
             'remarks': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
+            
+            # New widgets for Curriculum Structure checkboxes
+            'major_minor_multidisciplinary_course': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+            'skill_enhancement_course': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+            'ability_enhancement_course': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+            'value_added_course': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+            'apprenticeship_course': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
         }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        # REMOVED: self.fields['other_degree'].widget.attrs['style'] = 'display: none;'
+        # Make the other_degree field always appear (removed the 'display: none;' style)
+        # self.fields['other_degree'].widget.attrs['style'] = 'display: none;' # This line was removed
 
+
+        
 class CampusForm(forms.ModelForm):
     class Meta:
         model = Campus

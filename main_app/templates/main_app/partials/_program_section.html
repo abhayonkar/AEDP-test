@@ -1,60 +1,117 @@
-{% load static %}
-<div class="form-section" id="program">
-    <h2 class="section-title"><i class="fas fa-project-diagram me-2"></i>Implementation Progress of Selected AEDP Program         
-        <small style="color:red; font-size:smaller;">(Fill the data separately for each Program)</small></h2>
-    <form method="post" action="{% url 'program_create' %}">
-        {% csrf_token %}
-        <div class="row">
-            {% for field in program_form %}
-            <div class="col-md-6 mb-3">
-                <label class="form-label">{{ field.label }}</label>
-                {{ field }}
+<div class="card mb-3">
+    <div class="card-header">
+        Program Details
+    </div>
+    <div class="card-body">
+        <form method="post" enctype="multipart/form-data" action="{% url 'program_form' %}" class="data-form" data-section-id="collapseProgram">
+            {% csrf_token %}
+            
+            <div class="mb-3">
+                <label for="{{ program_form.program_name.id_for_label }}" class="form-label">Program Name</label>
+                {{ program_form.program_name }}
             </div>
-            {% endfor %}
-        </div>
-        <button type="submit" class="btn btn-primary">Add Program Entry</button>
-    </form>
-    <script src="{% static 'main_app/js/degree_toggle.js' %}"></script>
-    <hr class="my-4">
-    <h3 class="h5">Existing Entries</h3>
-    <div class="table-responsive">
-        <table class="table table-bordered table-striped mt-2">
-            <thead class="table-light">
-                <tr>
-                    <th rowspan="2" class="align-middle text-center">Program Name</th>
-                    <th colspan="4" class="text-center">Component Status</th>
-                    <th rowspan="2" class="align-middle text-center">Timeline</th>
-                    <th rowspan="2" class="align-middle text-center">Remarks</th>
-                    <th rowspan="2" class="align-middle text-center">Actions</th>
-                </tr>
-                <tr>
-                    <th class="text-center">1. Syllabus Preparation</th>
-                    <th class="text-center">2. Credit Allocation</th>
-                    <th class="text-center">3. Board of Deans Approval</th>
-                    <th class="text-center">4. Academic Council Approval</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for entry in program_entries %}
-                <tr>
-                    <td>{{ entry.program_name }}</td>
-                    <td>{{ entry.get_syllabus_preparation_display }}</td>
-                    <td>{{ entry.get_credit_allocation_display }}</td>
-                    <td>{{ entry.get_board_of_deans_approval_display }}</td>
-                    <td>{{ entry.get_academic_council_approval_display }}</td>
-                    <td>{{ entry.timeline }}</td>
-                    <td>{{ entry.remarks }}</td>
-                    <td>
-                        <a href="{% url 'program_update' entry.pk %}" class="btn btn-sm btn-warning"><i class="fas fa-edit"></i></a>
-                        <a href="{% url 'program_delete' entry.pk %}" class="btn btn-sm btn-danger"><i class="fas fa-trash"></i></a>
-                    </td>
-                </tr>
-                {% empty %}
-                <tr>
-                    <td colspan="8" class="text-center">No Program data added yet.</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+
+            <div class="mb-3" id="otherDegreeField">
+                <label for="{{ program_form.other_degree.id_for_label }}" class="form-label">Other Degree</label>
+                {{ program_form.other_degree }}
+            </div>
+
+            <div class="mb-3">
+                <label for="{{ program_form.specialization.id_for_label }}" class="form-label">Specialization/Branch</label>
+                {{ program_form.specialization }}
+            </div>
+
+            <div class="mb-3">
+                <label for="{{ program_form.curriculum_file.id_for_label }}" class="form-label">Curriculum File</label>
+                {{ program_form.curriculum_file }}
+                {% if program_form.instance.curriculum_file %}
+                    <small class="form-text text-muted">Current file: <a href="{{ program_form.instance.curriculum_file.url }}" target="_blank">{{ program_form.instance.curriculum_file.name }}</a></small>
+                {% endif %}
+            </div>
+
+            <div class="mb-3">
+                <label for="{{ program_form.syllabus_preparation.id_for_label }}" class="form-label">Syllabus Preparation</label>
+                {{ program_form.syllabus_preparation }}
+            </div>
+
+            <div class="mb-3">
+                <label for="{{ program_form.credit_allocation.id_for_label }}" class="form-label">Credit Allocation</label>
+                {{ program_form.credit_allocation }}
+            </div>
+
+            <div class="mb-3">
+                <label for="{{ program_form.board_of_deans_approval.id_for_label }}" class="form-label">Board of Deans Approval</label>
+                {{ program_form.board_of_deans_approval }}
+            </div>
+
+            <div class="mb-3">
+                <label for="{{ program_form.academic_council_approval.id_for_label }}" class="form-label">Academic Council Approval</label>
+                {{ program_form.academic_council_approval }}
+            </div>
+
+            <div class="mb-3">
+                <label for="{{ program_form.timeline.id_for_label }}" class="form-label">Timeline</label>
+                {{ program_form.timeline }}
+            </div>
+
+            <div class="mb-3">
+                <label for="{{ program_form.remarks.id_for_label }}" class="form-label">Remarks</label>
+                {{ program_form.remarks }}
+            </div>
+
+            {# New Section: Curriculum Structure #}
+            <div class="mb-3 p-3 border rounded bg-light">
+                <label class="form-label fw-bold">Curriculum Structure</label>
+                <div class="form-check">
+                    {{ program_form.major_minor_multidisciplinary_course }}
+                    <label class="form-check-label" for="{{ program_form.major_minor_multidisciplinary_course.id_for_label }}">
+                        Major/Minor multi disciplinary course
+                    </label>
+                </div>
+                <div class="form-check">
+                    {{ program_form.skill_enhancement_course }}
+                    <label class="form-check-label" for="{{ program_form.skill_enhancement_course.id_for_label }}">
+                        Skill enhancement course
+                    </label>
+                </div>
+                <div class="form-check">
+                    {{ program_form.ability_enhancement_course }}
+                    <label class="form-check-label" for="{{ program_form.ability_enhancement_course.id_for_label }}">
+                        Ability enhancement course
+                    </label>
+                </div>
+                <div class="form-check">
+                    {{ program_form.value_added_course }}
+                    <label class="form-check-label" for="{{ program_form.value_added_course.id_for_label }}">
+                        Value added course
+                    </label>
+                </div>
+                <div class="form-check">
+                    {{ program_form.apprenticeship_course }}
+                    <label class="form-check-label" for="{{ program_form.apprenticeship_course.id_for_label }}">
+                        Apprenticeship
+                    </label>
+                </div>
+                <p class="mt-2 mb-0"><strong>Number of Curriculum Structure components selected:</strong> <span id="num-curriculum-ticks">{{ program_form.instance.num_curriculum_ticks|default:0 }}</span></p>
+            </div>
+
+
+            <button type="submit" class="btn btn-primary">Save Program Details</button>
+            <a href="{% url 'program_delete' %}" class="btn btn-danger">Delete</a>
+        </form>
     </div>
 </div>
+
+{% comment %}
+    The degree_toggle.js script might still be present if it's included via base.html or another partial.
+    Given the request for the 'other_degree' field to *always* be visible,
+    the JS that hides/shows it based on 'Program Name' selection needs to be disabled or removed.
+    For this specific request, the Python form change ensures it's not hidden by default on initial render.
+    If the JS is still active, it would override this. You might need to check your static/js/ folder
+    or your base.html/user_dashboard.html for the inclusion of degree_toggle.js and remove it
+    if you want the 'other_degree' field to be *always* visible, regardless of 'Program Name' selection.
+{% endcomment %}
+
+{# This script might be responsible for toggling the 'other_degree' field visibility #}
+{# If 'other_degree' should always be visible, this script might need modification or removal #}
+{# <script src="{% static 'main_app/js/degree_toggle.js' %}"></script> #}

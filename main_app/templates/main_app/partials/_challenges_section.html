@@ -1,20 +1,16 @@
-<div class="form-section" id="challenges">
-    <h2 class="section-title"><i class="fas fa-exclamation-triangle me-2"></i>Challenges & Risk Mitigation</h2>
-    <form method="post" action="{% url 'update_challenges' %}">
-        {% csrf_token %}
-        {{ challenges_form.as_p }}
-        <button type="submit" class="btn btn-primary">Update Challenges</button>
-    </form>
-    <hr class="my-4">
-    <h3 class="h5">Current Information</h3>
-    <div class="table-responsive">
-        <table class="table table-bordered table-striped mt-2">
-            <tbody>
-                <tr>
-                    <th>Content</th>
-                    <td>{{ challenges.content|linebreaksbr }}</td>
-                </tr>
-            </tbody>
-        </table>
+<div class="card mb-3">
+    <div class="card-header">
+        Challenges
+    </div>
+    <div class="card-body">
+        <form method="post" action="{% url 'challenges_form' %}" class="data-form" data-section-id="collapseChallenges">
+            {% csrf_token %}
+            <div class="mb-3">
+                <label for="{{ challenges_form.content.id_for_label }}" class="form-label">Content</label>
+                {{ challenges_form.content }}
+            </div>
+            <button type="submit" class="btn btn-primary">Save Challenges</button>
+            <a href="{% url 'challenges_delete' %}" class="btn btn-danger">Delete</a>
+        </form>
     </div>
 </div>
