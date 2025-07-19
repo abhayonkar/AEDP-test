@@ -4,7 +4,45 @@
 <div class="container-fluid">
     <div class="row">
         <div class="col-12">
-            <!-- Include all the form sections -->
+            <!-- Welcome message when no section is selected -->
+            <div id="welcome-section" class="form-section text-center">
+                <h2 class="section-title">
+                    <i class="fas fa-chart-line me-2"></i>
+                    AEDP Implementation Dashboard
+                </h2>
+                <p class="lead text-muted">Select a section from the sidebar to view and update your information.</p>
+                <div class="row mt-4">
+                    <div class="col-md-4">
+                        <div class="card border-primary">
+                            <div class="card-body text-center">
+                                <i class="fas fa-info-circle fa-2x text-primary mb-2"></i>
+                                <h5 class="card-title">Basic Information</h5>
+                                <p class="card-text">Update your basic profile details</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card border-success">
+                            <div class="card-body text-center">
+                                <i class="fas fa-project-diagram fa-2x text-success mb-2"></i>
+                                <h5 class="card-title">Program Progress</h5>
+                                <p class="card-text">Track your program implementation</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card border-warning">
+                            <div class="card-body text-center">
+                                <i class="fas fa-calendar-alt fa-2x text-warning mb-2"></i>
+                                <h5 class="card-title">Timelines</h5>
+                                <p class="card-text">Manage important dates and milestones</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Include all the form sections with appropriate IDs -->
             {% include 'main_app/partials/_basic_info_section.html' %}
             {% include 'main_app/partials/_industry_section.html' %}
             {% include 'main_app/partials/_ssc_section.html' %}
@@ -17,4 +55,51 @@
         </div>
     </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const sidebarLinks = document.querySelectorAll('.list-group-item-action[data-section]');
+    const sections = document.querySelectorAll('.form-section[id]');
+    const welcomeSection = document.getElementById('welcome-section');
+    
+    // Hide all sections initially except welcome
+    sections.forEach(section => {
+        if (section.id !== 'welcome-section') {
+            section.style.display = 'none';
+        }
+    });
+    
+    // Add click event listeners to sidebar links
+    sidebarLinks.forEach(link => {
+        link.addEventListener('click', function(e) {
+            e.preventDefault();
+            
+            const targetSection = this.getAttribute('data-section');
+            
+            // Remove active class from all links
+            sidebarLinks.forEach(l => l.classList.remove('active'));
+            
+            // Add active class to clicked link
+            this.classList.add('active');
+            
+            // Hide welcome section
+            if (welcomeSection) {
+                welcomeSection.style.display = 'none';
+            }
+            
+            // Hide all sections
+            sections.forEach(section => {
+                section.style.display = 'none';
+            });
+            
+            // Show target section
+            const targetElement = document.getElementById(targetSection);
+            if (targetElement) {
+                targetElement.style.display = 'block';
+                targetElement.scrollIntoView({ behavior: 'smooth' });
+            }
+        });
+    });
+});
+</script>
 {% endblock %}

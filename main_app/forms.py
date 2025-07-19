@@ -158,8 +158,8 @@ class ProgramForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        # Make the other_degree field appear only when 'Others' is selected
-        self.fields['other_degree'].widget.attrs['style'] = 'display: none;'
+        # REMOVED: self.fields['other_degree'].widget.attrs['style'] = 'display: none;'
+
 class CampusForm(forms.ModelForm):
     class Meta:
         model = Campus
