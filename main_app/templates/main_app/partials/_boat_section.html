@@ -1,36 +1,53 @@
-<div class="card mb-3">
-    <div class="card-header">
-        Board of Apprenticeship Training (BOAT) Details
-    </div>
-    <div class="card-body">
-        <form method="post" action="{% url 'boat_form' %}" class="data-form" data-section-id="collapseBOAT">
-            {% csrf_token %}
-            <div class="mb-3">
-                <label for="{{ boat_form.campus_college_name.id_for_label }}" class="form-label">Campus/College Name</label>
-                {{ boat_form.campus_college_name }}
+<div class="form-section" id="boat">
+    <h2 class="section-title">
+        <i class="fas fa-ship me-2"></i>Board of Apprenticeship Training (BOAT) Collaboration Information
+        <small style="color:red; font-size:smaller;">(Fill the data separately for each program)</small>
+    </h2>
+    <form method="post" action="{% url 'boat_create' %}">
+        {% csrf_token %}
+        <div class="row">
+            {% for field in boat_form %}
+            <div class="col-md-6 mb-3">
+                <label class="form-label">{{ field.label }}</label>
+                {{ field }}
             </div>
-            <div class="mb-3">
-                <label for="{{ boat_form.mou_signed.id_for_label }}" class="form-label">MoU Signed</label>
-                {{ boat_form.mou_signed }}
-            </div>
-            <div class="mb-3">
-                <label for="{{ boat_form.aedp_programme.id_for_label }}" class="form-label">AEDP Programme</label>
-                {{ boat_form.aedp_programme }}
-            </div>
-            <div class="mb-3">
-                <label for="{{ boat_form.no_of_students.id_for_label }}" class="form-label">Number of Students</label>
-                {{ boat_form.no_of_students }}
-            </div>
-            <div class="mb-3">
-                <label for="{{ boat_form.stipend.id_for_label }}" class="form-label">Stipend</label>
-                {{ boat_form.stipend }}
-            </div>
-            <div class="mb-3">
-                <label for="{{ boat_form.other_information.id_for_label }}" class="form-label">Other Information</label>
-                {{ boat_form.other_information }}
-            </div>
-            <button type="submit" class="btn btn-primary">Save BOAT Details</button>
-            <a href="{% url 'boat_delete' %}" class="btn btn-danger">Delete</a>
-        </form>
+            {% endfor %}
+        </div>
+        <button type="submit" class="btn btn-primary">Add BOAT Entry</button>
+    </form>
+    <hr class="my-4">
+    <h3 class="h5">Existing Entries</h3>
+    <div class="table-responsive">
+        <table class="table table-bordered table-striped mt-2">
+            <thead>
+                <tr>
+                    <th>Title of AEDP Programme</th>
+                    <th>No. of Students</th>
+                    <th>Stipend</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for entry in boat_entries %}
+                <tr>
+                    <td>{{ entry.aedp_programme }}</td>
+                    <td>{{ entry.no_of_students }}</td>
+                    <td>{{ entry.stipend|default:"N/A" }}</td>
+                    <td>
+                        <a href="{% url 'boat_update' entry.pk %}" class="btn btn-sm btn-warning"><i class="fas fa-edit"></i></a>
+                        <a href="{% url 'boat_delete' entry.pk %}" class="btn btn-sm btn-danger"><i class="fas fa-trash"></i></a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="4" class="text-center">No BOAT data added yet.</td></tr>
+                {% endfor %}
+            </tbody>
+             <tfoot>
+                <tr>
+                    <td class="text-end"><strong>Total Students:</strong></td>
+                    <td colspan="3"><strong>{{ total_boat_students }}</strong></td>
+                </tr>
+            </tfoot>
+        </table>
     </div>
 </div>

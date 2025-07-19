@@ -17,7 +17,7 @@
     {% endif %}
 
     <div class="mb-3">
-        <a href="{% url 'generate_pdf_report' %}" class="btn btn-info">Generate PDF Report</a>
+        <a href="{% url 'download_report' user.id %}" class="btn btn-info">Generate PDF Report</a>
     </div>
 
     <div class="accordion" id="dataAccordion">

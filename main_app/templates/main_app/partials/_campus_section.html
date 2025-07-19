@@ -1,60 +1,128 @@
-<div class="card mb-3">
-    <div class="card-header">
-        Campus Details
-    </div>
-    <div class="card-body">
-        <form method="post" action="{% url 'campus_form' %}" class="data-form" data-section-id="collapseCampus">
-            {% csrf_token %}
-            <div class="mb-3">
-                <label for="{{ campus_form.campus_college_name.id_for_label }}" class="form-label">Campus/College Name</label>
+<div class="form-section" id="campus">
+    <h2 class="section-title"><i class="fas fa-university me-2"></i>AEDP Program Readiness : University Campus & College Details 
+        <small style="color:red; font-size:smaller;">(Fill the data separately for each Program)</small></h2>
+    <form method="post" action="{% url 'campus_create' %}">
+        {% csrf_token %}
+        
+        <!-- Row 1 -->
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <label class="form-label">{{ campus_form.campus_college_name.label }}</label>
                 {{ campus_form.campus_college_name }}
             </div>
-            <div class="mb-3">
-                <label for="{{ campus_form.aedp_programme.id_for_label }}" class="form-label">AEDP Programme</label>
+            <div class="col-md-6 mb-3">
+                <label class="form-label">{{ campus_form.aedp_programme.label }}</label>
                 {{ campus_form.aedp_programme }}
             </div>
-            <div class="mb-3">
-                <label for="{{ campus_form.sector_name.id_for_label }}" class="form-label">Sector Name</label>
+        </div>
+
+        <!-- Row 2 -->
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <label class="form-label">{{ campus_form.sector_name.label }}</label>
                 {{ campus_form.sector_name }}
             </div>
-            <div class="mb-3">
-                <label for="{{ campus_form.curriculum_type.id_for_label }}" class="form-label">Curriculum Type</label>
+            <div class="col-md-6 mb-3">
+                <label class="form-label">{{ campus_form.curriculum_type.label }}</label>
                 {{ campus_form.curriculum_type }}
             </div>
-            <div class="mb-3">
-                <label for="{{ campus_form.same_aedp_continued.id_for_label }}" class="form-label">Same AEDP Continued?</label>
+        </div>
+
+        <!-- Row 3 -->
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <label class="form-label">{{ campus_form.same_aedp_continued.label }}</label>
                 {{ campus_form.same_aedp_continued }}
             </div>
-            <div class="mb-3">
-                <label for="{{ campus_form.existing_degree_converted.id_for_label }}" class="form-label">Existing Degree Converted?</label>
+            <div class="col-md-6 mb-3">
+                <label class="form-label">{{ campus_form.existing_degree_converted.label }}</label>
                 {{ campus_form.existing_degree_converted }}
             </div>
-            <div class="mb-3">
-                <label for="{{ campus_form.faculty_department.id_for_label }}" class="form-label">Faculty/Department</label>
+        </div>
+
+        <!-- Row 4 -->
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <label class="form-label">{{ campus_form.faculty_department.label }}</label>
                 {{ campus_form.faculty_department }}
             </div>
-            <div class="mb-3">
-                <label for="{{ campus_form.duration.id_for_label }}" class="form-label">Duration</label>
+            <div class="col-md-6 mb-3">
+                <label class="form-label">{{ campus_form.duration.label }}</label>
                 {{ campus_form.duration }}
             </div>
-            <div class="mb-3">
-                <label for="{{ campus_form.apprenticeship_integration.id_for_label }}" class="form-label">Apprenticeship Integration</label>
+        </div>
+
+        <!-- Row 5 -->
+        <div class="row">
+            <div class="col-md-12 mb-3">
+                <label class="form-label">{{ campus_form.apprenticeship_integration.label }}</label>
                 {{ campus_form.apprenticeship_integration }}
             </div>
-            <div class="mb-3">
-                <label for="{{ campus_form.student_intake.id_for_label }}" class="form-label">Student Intake</label>
+        </div>
+
+        <!-- Row 6 -->
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <label class="form-label">{{ campus_form.student_intake.label }}</label>
                 {{ campus_form.student_intake }}
             </div>
-            <div class="mb-3">
-                <label for="{{ campus_form.student_enrolled.id_for_label }}" class="form-label">Student Enrolled</label>
+            <div class="col-md-6 mb-3">
+                <label class="form-label">{{ campus_form.student_enrolled.label }}</label>
                 {{ campus_form.student_enrolled }}
             </div>
-            <div class="mb-3">
-                <label for="{{ campus_form.industry_partners.id_for_label }}" class="form-label">Industry Partners</label>
+        </div>
+
+        <!-- Row 7 -->
+        <div class="row">
+            <div class="col-md-12 mb-3">
+                <label class="form-label">{{ campus_form.industry_partners.label }}</label>
                 {{ campus_form.industry_partners }}
             </div>
-            <button type="submit" class="btn btn-primary">Save Campus Details</button>
-            <a href="{% url 'campus_delete' %}" class="btn btn-danger">Delete</a>
-        </form>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Add Campus Entry</button>
+    </form>
+    
+    <!-- The table part remains the same -->
+    <hr class="my-4">
+    <h3 class="h5">Existing Entries</h3>
+    <div class="table-responsive">
+        <table class="table table-bordered table-striped mt-2">
+            <thead>
+                <tr>
+                    <th>Campus/College</th>
+                    <th>Programme</th>
+                    <th>Sector Name</th>
+                    <th>Duration</th>
+                    <th>Intake</th>
+                    <th>Student Enrolled</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for entry in campus_entries %}
+                <tr>
+                    <td>{{ entry.campus_college_name }}</td>
+                    <td>{{ entry.aedp_programme }}</td>
+                    <td>{{ entry.sector_name }}</td>
+                    <td>{{ entry.duration }}</td>
+                    <td>{{ entry.student_intake }}</td>
+                    <td>{{ entry.student_enrolled }}</td>
+                    <td>
+                        <a href="{% url 'campus_update' entry.pk %}" class="btn btn-sm btn-warning"><i class="fas fa-edit"></i></a>
+                        <a href="{% url 'campus_delete' entry.pk %}" class="btn btn-sm btn-danger"><i class="fas fa-trash"></i></a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="7" class="text-center">No Campus data added yet.</td></tr>
+                {% endfor %}
+            </tbody>
+            <tfoot>
+                <tr>
+                    <td colspan="5" class="text-end"><strong>Total Enrolled Students:</strong></td>
+                    <td colspan="2"><strong>{{ total_enrolled_students }}</strong></td>
+                </tr>
+            </tfoot>
+        </table>
     </div>
 </div>

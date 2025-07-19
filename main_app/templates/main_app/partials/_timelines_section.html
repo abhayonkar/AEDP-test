@@ -1,44 +1,55 @@
-<div class="card mb-3">
-    <div class="card-header">
-        Timelines
-    </div>
-    <div class="card-body">
-        <form method="post" action="{% url 'timelines_form' %}" class="data-form" data-section-id="collapseTimelines">
-            {% csrf_token %}
-            <div class="mb-3">
-                <label for="{{ timelines_form.curriculum_finalization.id_for_label }}" class="form-label">Curriculum Finalization</label>
-                {{ timelines_form.curriculum_finalization }}
+<div class="form-section" id="timelines">
+    <h2 class="section-title"><i class="fas fa-calendar-alt me-2"></i>Timelines</h2>
+    <form method="post" action="{% url 'update_timelines' %}">
+        {% csrf_token %}
+        <div class="row">
+            {% for field in timelines_form %}
+            <div class="col-md-6 mb-3">
+                <label class="form-label">{{ field.label }}</label>
+                {{ field }}
             </div>
-            <div class="mb-3">
-                <label for="{{ timelines_form.mou_execution.id_for_label }}" class="form-label">MoU Execution</label>
-                {{ timelines_form.mou_execution }}
-            </div>
-            <div class="mb-3">
-                <label for="{{ timelines_form.internal_approvals.id_for_label }}" class="form-label">Internal Approvals</label>
-                {{ timelines_form.internal_approvals }}
-            </div>
-            <div class="mb-3">
-                <label for="{{ timelines_form.faculty_orientation.id_for_label }}" class="form-label">Faculty Orientation</label>
-                {{ timelines_form.faculty_orientation }}
-            </div>
-            <div class="mb-3">
-                <label for="{{ timelines_form.admission_campaign_launch.id_for_label }}" class="form-label">Admission Campaign Launch</label>
-                {{ timelines_form.admission_campaign_launch }}
-            </div>
-            <div class="mb-3">
-                <label for="{{ timelines_form.student_enrollment_begin.id_for_label }}" class="form-label">Student Enrollment Begin</label>
-                {{ timelines_form.student_enrollment_begin }}
-            </div>
-            <div class="mb-3">
-                <label for="{{ timelines_form.program_commencement.id_for_label }}" class="form-label">Program Commencement</label>
-                {{ timelines_form.program_commencement }}
-            </div>
-            <div class="mb-3">
-                <label for="{{ timelines_form.monthly_progress_reporting.id_for_label }}" class="form-label">Monthly Progress Reporting</label>
-                {{ timelines_form.monthly_progress_reporting }}
-            </div>
-            <button type="submit" class="btn btn-primary">Save Timelines</button>
-            <a href="{% url 'timelines_delete' %}" class="btn btn-danger">Delete</a>
-        </form>
+            {% endfor %}
+        </div>
+        <button type="submit" class="btn btn-primary">Update Timelines</button>
+    </form>
+    <hr class="my-4">
+    <h3 class="h5">Current Information</h3>
+    <div class="table-responsive">
+        <table class="table table-bordered table-striped mt-2">
+            <tbody>
+                <tr>
+                    <th style="width: 40%;">Curriculum Finalization</th>
+                    <td>{{ timelines.curriculum_finalization }}</td>
+                </tr>
+                <tr>
+                    <th>Mou Execution</th>
+                    <td>{{ timelines.mou_execution }}</td>
+                </tr>
+                <tr>
+                    <th>Internal Approvals</th>
+                    <td>{{ timelines.internal_approvals }}</td>
+                </tr>
+                <tr>
+                    <th>Faculty Orientation</th>
+                    <td>{{ timelines.faculty_orientation }}</td>
+                </tr>
+                <tr>
+                    <th>Admission Campaign Launch</th>
+                    <td>{{ timelines.admission_campaign_launch }}</td>
+                </tr>
+                <tr>
+                    <th>Student Enrollment Begin</th>
+                    <td>{{ timelines.student_enrollment_begin }}</td>
+                </tr>
+                <tr>
+                    <th>Program Commencement</th>
+                    <td>{{ timelines.program_commencement }}</td>
+                </tr>
+                <tr>
+                    <th>Monthly Progress Reporting</th>
+                    <td>{{ timelines.monthly_progress_reporting }}</td>
+                </tr>
+            </tbody>
+        </table>
     </div>
 </div>

@@ -1,36 +1,48 @@
-<div class="card mb-3">
-    <div class="card-header">
-        Outreach Activity Details
-    </div>
-    <div class="card-body">
-        <form method="post" action="{% url 'outreach_form' %}" class="data-form" data-section-id="collapseOutreach">
-            {% csrf_token %}
-            <div class="mb-3">
-                <label for="{{ outreach_form.nodal_officer_orientation.id_for_label }}" class="form-label">Nodal Officer Orientation</label>
-                {{ outreach_form.nodal_officer_orientation }}
+<div class="form-section" id="outreach">
+    <h2 class="section-title"><i class="fas fa-bullhorn me-2"></i>Outreach & Stakeholder Engagement</h2>
+    <form method="post" action="{% url 'update_outreach' %}">
+        {% csrf_token %}
+        <div class="row">
+            {% for field in outreach_form %}
+            <div class="col-md-6 mb-3">
+                <label class="form-label">{{ field.label }}</label>
+                {{ field }}
             </div>
-            <div class="mb-3">
-                <label for="{{ outreach_form.faculty_workshops.id_for_label }}" class="form-label">Faculty Workshops</label>
-                {{ outreach_form.faculty_workshops }}
-            </div>
-            <div class="mb-3">
-                <label for="{{ outreach_form.industry_workshops.id_for_label }}" class="form-label">Industry Workshops</label>
-                {{ outreach_form.industry_workshops }}
-            </div>
-            <div class="mb-3">
-                <label for="{{ outreach_form.district_outreach_programs.id_for_label }}" class="form-label">District Outreach Programs</label>
-                {{ outreach_form.district_outreach_programs }}
-            </div>
-            <div class="mb-3">
-                <label for="{{ outreach_form.parent_orientation.id_for_label }}" class="form-label">Parent Orientation</label>
-                {{ outreach_form.parent_orientation }}
-            </div>
-            <div class="mb-3">
-                <label for="{{ outreach_form.autonomous_colleges_onboarded.id_for_label }}" class="form-label">Autonomous Colleges Onboarded</label>
-                {{ outreach_form.autonomous_colleges_onboarded }}
-            </div>
-            <button type="submit" class="btn btn-primary">Save Outreach Details</button>
-            <a href="{% url 'outreach_delete' %}" class="btn btn-danger">Delete</a>
-        </form>
+            {% endfor %}
+        </div>
+        <button type="submit" class="btn btn-primary">Update Outreach Data</button>
+    </form>
+
+    <hr class="my-4">
+    <h3 class="h5">Current Information</h3>
+    <div class="table-responsive">
+        <table class="table table-bordered table-striped mt-2">
+            <tbody>
+                <tr>
+                    <th style="width: 40%;">Nodal Officer Orientation</th>
+                    <td>{{ outreach.nodal_officer_orientation }}</td>
+                </tr>
+                <tr>
+                    <th>Faculty Workshops</th>
+                    <td>{{ outreach.faculty_workshops }}</td>
+                </tr>
+                <tr>
+                    <th>Industry Workshops</th>
+                    <td>{{ outreach.industry_workshops }}</td>
+                </tr>
+                <tr>
+                    <th>District Outreach Programs</th>
+                    <td>{{ outreach.district_outreach_programs }}</td>
+                </tr>
+                <tr>
+                    <th>Parent Orientation</th>
+                    <td>{{ outreach.parent_orientation }}</td>
+                </tr>
+                <tr>
+                    <th>Autonomous Colleges Onboarded</th>
+                    <td>{{ outreach.autonomous_colleges_onboarded }}</td>
+                </tr>
+            </tbody>
+        </table>
     </div>
 </div>

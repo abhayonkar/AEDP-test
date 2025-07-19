@@ -1,36 +1,66 @@
-<div class="card mb-3">
-    <div class="card-header">
-        Basic Information
-    </div>
-    <div class="card-body">
-        <form method="post" action="{% url 'basic_info_form' %}" class="data-form" data-section-id="collapseBasicInfo">
-            {% csrf_token %}
-            <div class="mb-3">
-                <label for="{{ basic_info_form.university_name.id_for_label }}" class="form-label">University Name</label>
+<div class="form-section" id="basic_info">
+    <h2 class="section-title"><i class="fas fa-info-circle me-2"></i>Basic Information</h2>
+    <form method="post" action="{% url 'update_basic_info' %}">
+        {% csrf_token %}
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <label class="form-label">University Name</label>
                 {{ basic_info_form.university_name }}
             </div>
-            <div class="mb-3">
-                <label for="{{ basic_info_form.pvc_name.id_for_label }}" class="form-label">PVC Name</label>
+            <div class="col-md-6 mb-3">
+                <label class="form-label">PVC Name</label>
                 {{ basic_info_form.pvc_name }}
             </div>
-            <div class="mb-3">
-                <label for="{{ basic_info_form.report_date.id_for_label }}" class="form-label">Report Date</label>
+            <div class="col-md-6 mb-3">
+                <label class="form-label">Report Date</label>
                 {{ basic_info_form.report_date }}
             </div>
-            <div class="mb-3">
-                <label for="{{ basic_info_form.academic_year.id_for_label }}" class="form-label">Academic Year</label>
+            <div class="col-md-6 mb-3">
+                <label class="form-label">Academic Year</label>
                 {{ basic_info_form.academic_year }}
             </div>
-            <div class="mb-3">
-                <label for="{{ basic_info_form.district.id_for_label }}" class="form-label">District</label>
+            <div class="col-md-6 mb-3">
+                <label class="form-label">District</label>
                 {{ basic_info_form.district }}
             </div>
-            <div class="mb-3">
-                <label for="{{ basic_info_form.aishe_code.id_for_label }}" class="form-label">AISHE Code</label>
+            <div class="col-md-6 mb-3">
+                <label class="form-label">AISHE Code</label>
                 {{ basic_info_form.aishe_code }}
             </div>
-            <button type="submit" class="btn btn-primary">Save Basic Info</button>
-            <a href="{% url 'basic_info_delete' %}" class="btn btn-danger">Delete</a>
-        </form>
+        </div>
+        <button type="submit" class="btn btn-primary">Update Basic Info</button>
+    </form>
+
+    <hr class="my-4">
+    <h3 class="h5">Current Information</h3>
+    <div class="table-responsive">
+        <table class="table table-bordered table-striped mt-2">
+            <tbody>
+                <tr>
+                    <th style="width: 30%;">University Name</th>
+                    <td>{{ basic_info.university_name }}</td>
+                </tr>
+                <tr>
+                    <th>PVC Name</th>
+                    <td>{{ basic_info.pvc_name }}</td>
+                </tr>
+                <tr>
+                    <th>District</th>
+                    <td>{{ basic_info.district }}</td>
+                </tr>
+                <tr>
+                    <th>AISHE Code</th>
+                    <td>{{ basic_info.aishe_code }}</td>
+                </tr>
+                <tr>
+                    <th>Report Date</th>
+                    <td>{{ basic_info.report_date }}</td>
+                </tr>
+                <tr>
+                    <th>Academic Year</th>
+                    <td>{{ basic_info.academic_year }}</td>
+                </tr>
+            </tbody>
+        </table>
     </div>
 </div>

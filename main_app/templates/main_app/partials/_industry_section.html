@@ -1,68 +1,73 @@
-<div class="card mb-3">
-    <div class="card-header">
-        Industry Engagement
-    </div>
-    <div class="card-body">
-        <form method="post" action="{% url 'industry_form' %}" class="data-form" data-section-id="collapseIndustry">
-            {% csrf_token %}
-            <div class="mb-3">
-                <label for="{{ industry_form.industry_name.id_for_label }}" class="form-label">Industry Name</label>
-                {{ industry_form.industry_name }}
+<div class="form-section" id="industry">
+    <h2 class="section-title"><i class="fas fa-handshake me-2"></i>Industry Engagement & MoUs
+        <small style="color:red; font-size:smaller;">(Fill the data separately for each Industry & MoUs)</small></h2>
+
+    <form method="post" action="{% url 'industry_create' %}">
+        {% csrf_token %}
+        <div class="row">
+            {% for field in industry_form %}
+            <div class="col-md-6 mb-3">
+                <label class="form-label">
+                    {{ field.label }}
+                    {% if field.name == 'type_of_engagement' %}
+                        <!-- (Curriculum, Apprenticeship, Assessment, Stipend) -->
+                    {% endif %}
+                </label>
+                {{ field }}
             </div>
-            <div class="mb-3">
-                <label for="{{ industry_form.sector_name.id_for_label }}" class="form-label">Sector Name</label>
-                {{ industry_form.sector_name }}
-            </div>
-            <div class="mb-3">
-                <label for="{{ industry_form.mou_signed.id_for_label }}" class="form-label">MoU Signed</label>
-                {{ industry_form.mou_signed }}
-            </div>
-            <div class="mb-3">
-                <label for="{{ industry_form.curriculum_consulted_to_industry.id_for_label }}" class="form-label">Curriculum Consulted to Industry</label>
-                {{ industry_form.curriculum_consulted_to_industry }}
-            </div>
-            <div class="mb-3">
-                <label for="{{ industry_form.aedp_programme.id_for_label }}" class="form-label">AEDP Programme</label>
-                {{ industry_form.aedp_programme }}
-            </div>
-            <div class="mb-3">
-                <label for="{{ industry_form.start_date.id_for_label }}" class="form-label">Start Date</label>
-                {{ industry_form.start_date }}
-            </div>
-            <div class="mb-3">
-                <label for="{{ industry_form.validity_date.id_for_label }}" class="form-label">Validity Date</label>
-                {{ industry_form.validity_date }}
-            </div>
-            <div class="mb-3">
-                <label for="{{ industry_form.student_commitment.id_for_label }}" class="form-label">Student Commitment</label>
-                {{ industry_form.student_commitment }}
-            </div>
-            <div class="mb-3">
-                <label for="{{ industry_form.stipend_range.id_for_label }}" class="form-label">Stipend Range</label>
-                {{ industry_form.stipend_range }}
-            </div>
-            <div class="mb-3">
-                <label for="{{ industry_form.type_of_engagement.id_for_label }}" class="form-label">Type of Engagement</label>
-                {{ industry_form.type_of_engagement }}
-            </div>
-            <div class="mb-3">
-                <label for="{{ industry_form.contact_person.id_for_label }}" class="form-label">Contact Person</label>
-                {{ industry_form.contact_person }}
-            </div>
-            <div class="mb-3">
-                <label for="{{ industry_form.location_head.id_for_label }}" class="form-label">Location Head</label>
-                {{ industry_form.location_head }}
-            </div>
-            <div class="mb-3">
-                <label for="{{ industry_form.other_locations.id_for_label }}" class="form-label">Other Locations</label>
-                {{ industry_form.other_locations }}
-            </div>
-            <div class="mb-3">
-                <label for="{{ industry_form.other_details.id_for_label }}" class="form-label">Other Details</label>
-                {{ industry_form.other_details }}
-            </div>
-            <button type="submit" class="btn btn-primary">Save Industry Details</button>
-            <a href="{% url 'industry_delete' %}" class="btn btn-danger">Delete</a>
-        </form>
+            {% endfor %}
+        </div>
+        <button type="submit" class="btn btn-primary">Add Industry Entry</button>
+    </form>
+
+    <hr class="my-4">
+
+    <h3 class="h5">Existing Entries</h3>
+    <div class="table-responsive">
+        <table class="table table-bordered table-striped mt-2">
+            <thead>
+                <tr>
+                    <th>Industry Name</th>
+                    <th>Sector</th>
+                    <th>MoU Signed</th>
+                    <th>Curriculum Consulted</th>  
+                    <th>Start Date</th>
+                    <th>Validity Date</th>
+                    <th>Student Commitment (No. of students)</th>
+                    <th>Stipend Range</th>
+                    <th>Engagement Type</th>
+                    <th>Other Locations</th>  
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for entry in industry_entries %}
+                <tr>
+                    <td>{{ entry.industry_name }}</td>
+                    <td>{{ entry.sector_name }}</td>
+                    <td>{{ entry.mou_signed }}</td>
+                    <td>{{ entry.curriculum_consulted_to_industry }}</td>
+                    <td>{{ entry.other_locations|default:"N/A" }}</td>
+                    <td>{{ entry.start_date|default:"N/A" }}</td>
+                    <td>{{ entry.validity_date|default:"N/A" }}</td>
+                    <td>{{ entry.student_commitment }}</td>
+                    <td>{{ entry.stipend_range|default:"N/A" }}</td>
+                    <td>{{ entry.type_of_engagement }}</td>
+                    <td>
+                        <a href="{% url 'industry_update' entry.pk %}" class="btn btn-sm btn-warning"><i class="fas fa-edit"></i></a>
+                        <a href="{% url 'industry_delete' entry.pk %}" class="btn btn-sm btn-danger"><i class="fas fa-trash"></i></a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="9" class="text-center">No industry data added yet.</td></tr>
+                {% endfor %}
+            </tbody>
+            <tfoot>
+                <tr>
+                    <td colspan="5" class="text-end"><strong>Total Student Commitment:</strong></td>
+                    <td colspan="4"><strong>{{ total_student_commitment }}</strong></td>
+                </tr>
+            </tfoot>
+        </table>
     </div>
 </div>

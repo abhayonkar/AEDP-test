@@ -9,18 +9,24 @@ YES_NO_CHOICES = [
 ]
 
 DEGREE_CHOICES = [
-        ('B.Com', 'B.Com'),
-        ('B.A.', 'B.A.'),
-        ('B.Sc.', 'B.Sc.'),
-        ('B.M.S.', 'B.M.S.'),
-        ('B.Tech', 'B.Tech'),
-        ('B.B.A.', 'B.B.A.'),
-        ('Others', 'Others')
-    ]
+    ('B.Voc', 'B.Voc'),
+    ('M.Voc', 'M.Voc'),
+    ('D.Voc', 'D.Voc'),
+    ('B.Sc', 'B.Sc'),
+    ('M.Sc', 'M.Sc'),
+    ('B.A', 'B.A'),
+    ('M.A', 'M.A'),
+    ('B.Com', 'B.Com'),
+    ('M.Com', 'M.Com'),
+    ('Others', 'Others'), # Added 'Others' for flexibility
+]
 
 DURATION_CHOICES = [
-    ('3-Year UG', '3-Year UG'),
-    ('4-Year UG', '4-Year UG'),
+    ('1 Year', '1 Year'),
+    ('2 Years', '2 Years'),
+    ('3 Years', '3 Years'),
+    ('4 Years', '4 Years'),
+    ('5 Years', '5 Years'),
 ]
 
 # Basic Information Model
@@ -28,7 +34,7 @@ class BasicInfo(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     university_name = models.CharField(max_length=255)
     pvc_name = models.CharField(max_length=255)
-    report_date = models.DateField()
+    report_date = models.DateField(null=True, blank=True) # Made nullable and blankable
     academic_year = models.CharField(max_length=9)
     district = models.CharField(max_length=100)
     aishe_code = models.CharField(max_length=20, blank=True, null=True) # Added AISHE Code
@@ -45,11 +51,11 @@ class Industry(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     industry_name = models.CharField(max_length=255)
     sector_name = models.CharField(max_length=255)
-    mou_signed = models.CharField(max_length=3, choices=YES_NO_CHOICES)
-    curriculum_consulted_to_industry = models.CharField(max_length=3, choices=YES_NO_CHOICES, default='No')
+    mou_signed = models.CharField(max_length=255, choices=YES_NO_CHOICES) # Increased max_length
+    curriculum_consulted_to_industry = models.CharField(max_length=255, choices=YES_NO_CHOICES, default='No') # Increased max_length
     aedp_programme = models.CharField(max_length=255)
-    start_date = models.DateField()
-    validity_date = models.DateField()
+    start_date = models.DateField(null=True, blank=True) # Made nullable and blankable
+    validity_date = models.DateField(null=True, blank=True) # Made nullable and blankable
     student_commitment = models.IntegerField()
     stipend_range = models.CharField(max_length=255)
     type_of_engagement = models.TextField()
@@ -72,9 +78,9 @@ class SSC(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     ssc_name = models.CharField(max_length=255)
     sector_name = models.CharField(max_length=255)
-    mou_signed = models.CharField(max_length=3, choices=YES_NO_CHOICES)
-    start_date = models.DateField()
-    validity_date = models.DateField()
+    mou_signed = models.CharField(max_length=255, choices=YES_NO_CHOICES) # Increased max_length
+    start_date = models.DateField(null=True, blank=True) # Made nullable and blankable
+    validity_date = models.DateField(null=True, blank=True) # Made nullable and blankable
     aedp_programme = models.CharField(max_length=255)
     type_of_engagement = models.TextField()
     contact_person = models.TextField()
@@ -91,7 +97,7 @@ class SSC(models.Model):
 class BOAT(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     campus_college_name = models.CharField(max_length=255)
-    mou_signed = models.CharField(max_length=3, choices=YES_NO_CHOICES)
+    mou_signed = models.CharField(max_length=255, choices=YES_NO_CHOICES) # Increased max_length
     aedp_programme = models.CharField(max_length=255)
     no_of_students = models.IntegerField()
     stipend = models.CharField(max_length=255)
@@ -111,10 +117,10 @@ class Program(models.Model):
     other_degree = models.CharField(max_length=255, blank=True, null=True)
     specialization = models.CharField(max_length=255, blank=True, null=True)
     curriculum_file = models.FileField(upload_to='curriculum_files/', blank=True, null=True)
-    syllabus_preparation = models.CharField(max_length=3, choices=YES_NO_CHOICES)
-    credit_allocation = models.CharField(max_length=3, choices=YES_NO_CHOICES)
-    board_of_deans_approval = models.CharField(max_length=3, choices=YES_NO_CHOICES)
-    academic_council_approval = models.CharField(max_length=3, choices=YES_NO_CHOICES)
+    syllabus_preparation = models.CharField(max_length=255, choices=YES_NO_CHOICES) # Increased max_length
+    credit_allocation = models.CharField(max_length=255, choices=YES_NO_CHOICES) # Increased max_length
+    board_of_deans_approval = models.CharField(max_length=255, choices=YES_NO_CHOICES) # Increased max_length
+    academic_council_approval = models.CharField(max_length=255, choices=YES_NO_CHOICES) # Increased max_length
     timeline = models.CharField(max_length=255, blank=True, null=True)
     remarks = models.TextField(blank=True, null=True)
     
@@ -140,10 +146,10 @@ class Campus(models.Model):
     aedp_programme = models.CharField(max_length=255, blank=True, null=True) # Made nullable as per migration
     sector_name = models.CharField(max_length=255, blank=True, null=True) # Added sector name
     curriculum_type = models.TextField()
-    same_aedp_continued = models.CharField(max_length=3, choices=YES_NO_CHOICES)
-    existing_degree_converted = models.CharField(max_length=3, choices=YES_NO_CHOICES)
+    same_aedp_continued = models.CharField(max_length=255, choices=YES_NO_CHOICES) # Increased max_length
+    existing_degree_converted = models.CharField(max_length=255, choices=YES_NO_CHOICES) # Increased max_length
     faculty_department = models.CharField(max_length=255)
-    duration = models.CharField(max_length=10, choices=DURATION_CHOICES)
+    duration = models.CharField(max_length=255, choices=DURATION_CHOICES) # Already 255 from previous step, ensuring consistency
     apprenticeship_integration = models.TextField()
     student_intake = models.IntegerField()
     student_enrolled = models.IntegerField()
